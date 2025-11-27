@@ -9,6 +9,11 @@ Route::middleware('api')->prefix('api')->group(function () {
         Route::post('/auth/logout', 'SanctumAuthController@logout');
     });
 
+    // Health check for platform / readiness
+    Route::get('/health', function () {
+        return response()->json(['status' => 'ok', 'time' => now()->toDateTimeString()]);
+    });
+
     // ===== Order Endpoints =====
     Route::post('/orders', 'OrderController@store');
     Route::get('/orders/{id}', 'OrderController@show');
@@ -45,6 +50,8 @@ Route::middleware('api')->prefix('api')->group(function () {
     // Chat endpoints
     Route::get('/chat/messages', 'ChatController@index');
     Route::post('/chat/messages', 'ChatController@store');
+    // Chat AI responder (server-side proxy to OpenAI)
+    Route::post('/chat/respond', 'ChatAIController@respond');
 
     // ===== Payment Methods (seller wallets) =====
     Route::middleware('auth:sanctum')->group(function () {
