@@ -14,6 +14,9 @@ import {
 } from '@stripe/react-stripe-js';
 import './Checkout.css';
 
+// Resolve API base for Vite/Cra compatibility
+const API_URL = (import.meta as any).env.VITE_API_URL || (import.meta as any).env.VITE_API_BASE || (window as any).REACT_APP_API_BASE || 'http://localhost:8000/api';
+
 // ===== Types =====
 interface OrderItem {
   id: string;
@@ -58,7 +61,7 @@ interface PaymentState {
 export const Checkout: React.FC<{ order: Order }> = ({ order }) => {
   const stripePromise = useMemo(
     () =>
-      loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || ''),
+      loadStripe((import.meta as any).env.VITE_STRIPE_PUBLIC_KEY || process.env.REACT_APP_STRIPE_PUBLIC_KEY || ''),
     []
   );
 
@@ -149,7 +152,7 @@ const CheckoutForm: React.FC<{ order: Order }> = ({ order }) => {
   const createOrder = useCallback(async (): Promise<string | null> => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_BASE}/orders`,
+        `${API_URL}/orders`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -194,7 +197,7 @@ const CheckoutForm: React.FC<{ order: Order }> = ({ order }) => {
 
         // Send token to backend
         const response = await fetch(
-          `${process.env.REACT_APP_API_BASE}/payments/card`,
+          `${API_URL}/payments/card`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -240,7 +243,7 @@ const CheckoutForm: React.FC<{ order: Order }> = ({ order }) => {
     async (orderId: string) => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_BASE}/payments/paypal`,
+          `${API_URL}/payments/paypal`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -272,7 +275,7 @@ const CheckoutForm: React.FC<{ order: Order }> = ({ order }) => {
     async (orderId: string) => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_BASE}/payments/binance`,
+          `${API_URL}/payments/binance`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -304,7 +307,7 @@ const CheckoutForm: React.FC<{ order: Order }> = ({ order }) => {
     async (orderId: string) => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_BASE}/payments/voucher`,
+          `${API_URL}/payments/voucher`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

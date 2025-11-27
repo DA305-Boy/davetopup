@@ -6,9 +6,12 @@ export default function Chat() {
   const [body, setBody] = useState('')
   const [name, setName] = useState('')
 
+  // Resolve API base: VITE_API_URL (preferred) -> VITE_API_BASE / REACT shim -> fallback
+  const API_URL = (import.meta as any).env.VITE_API_URL || (import.meta as any).env.VITE_API_BASE || (window as any).REACT_APP_API_BASE || 'http://localhost:8000/api'
+
   const load = async () => {
     try {
-      const res = await axios.get((window as any).REACT_APP_API_BASE + '/chat/messages')
+      const res = await axios.get(API_URL + '/chat/messages')
       setMessages(res.data.messages || [])
     } catch (err) {
       console.error(err)
@@ -20,7 +23,7 @@ export default function Chat() {
   const send = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await axios.post((window as any).REACT_APP_API_BASE + '/chat/messages', { body, author_name: name })
+      await axios.post(API_URL + '/chat/messages', { body, author_name: name })
       setBody('')
       load()
     } catch (err) {
