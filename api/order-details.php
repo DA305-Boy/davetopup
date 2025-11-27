@@ -5,7 +5,13 @@
  */
 
 header('Content-Type: application/json; charset=UTF-8');
-header('Access-Control-Allow-Origin: https://www.davetopup.com');
+
+// Allow CORS for localhost and production
+$allowedOrigins = ['https://www.davetopup.com', 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1', 'http://localhost'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins) || preg_match('/localhost/', $origin)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+}
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -13,8 +19,11 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/utils/security.php';
 require_once __DIR__ . '/utils/logger.php';
 
-// Enforce HTTPS
-if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+// Allow HTTP in development
+$isDevelopment = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', 'localhost:8000']);
+$isProduction = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
+if ($isProduction && (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off')) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'HTTPS required']);
     exit;
@@ -39,15 +48,24 @@ if (!$orderId) {
 try {
     global $db;
 
-    // Fetch order details
+    // Try fetching from orders table first (product orders from index2.html)
     $stmt = $db->prepare(
-        "SELECT order_id, email, player_id, payment_method, amount, currency, status, created_at 
-         FROM transactions 
+        "SELECT order_id, email, customer_name, product_id, product_name, payment_method, amount, currency, status, created_at 
+         FROM orders 
          WHERE order_id = ? LIMIT 1"
     );
 
     if (!$stmt) {
-        throw new Exception("Prepare error: " . $db->error);
+        // Fallback to transactions table (player topup orders)
+        $stmt = $db->prepare(
+            "SELECT order_id, email, player_id as product_id, NULL as product_name, payment_method, amount, currency, status, created_at 
+             FROM transactions 
+             WHERE order_id = ? LIMIT 1"
+        );
+
+        if (!$stmt) {
+            throw new Exception("Prepare error: " . $db->error);
+        }
     }
 
     $stmt->bind_param('s', $orderId);
@@ -68,15 +86,19 @@ try {
     // Return order details
     echo json_encode([
         'success' => true,
-        'orderId' => $order['order_id'],
-        'email' => $order['email'],
-        'playerId' => $order['player_id'],
-        'paymentMethod' => $order['payment_method'],
-        'amount' => $order['amount'],
-        'total' => $order['amount'], // Total = amount (fees already included)
-        'currency' => $order['currency'],
-        'status' => $order['status'],
-        'createdAt' => $order['created_at'],
+        'data' => [
+            'orderId' => $order['order_id'],
+            'email' => $order['email'],
+            'customerName' => $order['customer_name'] ?? 'Guest',
+            'productId' => $order['product_id'],
+            'productName' => $order['product_name'],
+            'paymentMethod' => $order['payment_method'],
+            'amount' => $order['amount'],
+            'total' => $order['amount'],
+            'currency' => $order['currency'],
+            'status' => $order['status'],
+            'createdAt' => $order['created_at'],
+        ]
     ]);
 
 } catch (Exception $e) {

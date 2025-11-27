@@ -1,18 +1,14 @@
 <?php
 /**
  * Webhook Handlers for Payment Gateway Integration
- * Stripe, PayPal, and Binance Pay webhooks
+ * Stripe, PayPal, Binance Pay, Coinbase, Skrill, Flutterwave
  */
 
 header('Content-Type: application/json; charset=UTF-8');
 
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../config/payments.php';
-require_once __DIR__ . '/../utils/security.php';
 require_once __DIR__ . '/../utils/logger.php';
-
-// Determine which webhook to process
-$webhookType = basename($_SERVER['REQUEST_URI'], '.php');
+require_once __DIR__ . '/../utils/security.php';
 
 // Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -20,20 +16,52 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-switch ($webhookType) {
-    case 'stripe':
-        handleStripeWebhook();
-        break;
-    case 'paypal':
-        handlePayPalWebhook();
-        break;
-    case 'binance':
-        handleBinanceWebhook();
-        break;
-    default:
-        http_response_code(404);
-        exit;
+// Get the raw payload
+$payload = file_get_contents('php://input');
+$inputData = json_decode($payload, true);
+
+// Determine which webhook processor to use
+$pathParts = explode('/', $_SERVER['REQUEST_URI']);
+$webhookType = end($pathParts);
+
+try {
+    switch ($webhookType) {
+        case 'stripe':
+            handleStripeWebhook($payload);
+            break;
+        case 'paypal':
+            handlePayPalWebhook($inputData);
+            break;
+        case 'binance':
+            handleBinanceWebhook($inputData);
+            break;
+        case 'coinbase':
+            handleCoinbaseWebhook($inputData);
+            break;
+        case 'skrill':
+            handleSkrillWebhook($inputData);
+            break;
+        case 'flutterwave':
+            handleFlutterwaveWebhook($inputData);
+            break;
+        case 'cashapp':
+            handleCashAppWebhook($inputData);
+            break;
+        default:
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Webhook not found']);
+            exit;
+    }
+
+} catch (Exception $e) {
+    Logger::error("Webhook error: {$e->getMessage()}");
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Processing error']);
+    exit;
 }
+
+http_response_code(200);
+echo json_encode(['success' => true, 'message' => 'Webhook processed']);
 
 // ===== Stripe Webhook Handler =====
 function handleStripeWebhook() {
@@ -346,4 +374,353 @@ function sendConfirmationEmail($email, $orderId, $amount) {
 
     return mail($email, $subject, $message, $headers);
 }
+
+// ===== Coinbase Webhook Handler =====
+function handleCoinbaseWebhook($webhookData) {
+    global $db;
+
+    $webhookSecret = getenv('COINBASE_WEBHOOK_SECRET');
+    $signature = $_SERVER['HTTP_X_CC_WEBHOOK_SIGNATURE'] ?? '';
+
+    try {
+        // Verify signature
+        $payload = file_get_contents('php://input');
+        $expectedSig = 'sha256=' . hash_hmac('sha256', $payload, $webhookSecret);
+
+        if (!hash_equals($expectedSig, $signature)) {
+            throw new Exception('Invalid Coinbase signature');
+        }
+
+        Logger::info("Coinbase webhook received: {$webhookData['type']}");
+
+        if ($webhookData['type'] === 'charge:confirmed' || $webhookData['type'] === 'charge:received') {
+            handleCoinbasePaymentSuccess($webhookData['data']);
+        } elseif ($webhookData['type'] === 'charge:failed' || $webhookData['type'] === 'charge:unresolved') {
+            handleCoinbasePaymentFailed($webhookData['data']);
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        Logger::error("Coinbase webhook error: " . $e->getMessage());
+        http_response_code(403);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+}
+
+function handleCoinbasePaymentSuccess($charge) {
+    global $db;
+
+    $orderId = $charge['metadata']['orderId'] ?? null;
+    if (!$orderId) return;
+
+    $coinbaseChargeId = $charge['id'];
+
+    $stmt = $db->prepare(
+        "UPDATE transactions SET status = 'completed', transaction_id = ?, updated_at = NOW() WHERE order_id = ?"
+    );
+    $stmt->bind_param('ss', $coinbaseChargeId, $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    $result = $db->query("SELECT email, amount FROM transactions WHERE order_id = '$orderId'");
+    if ($row = $result->fetch_assoc()) {
+        sendConfirmationEmail($row['email'], $orderId, $row['amount']);
+        Logger::info("Coinbase payment completed for order: $orderId");
+    }
+}
+
+function handleCoinbasePaymentFailed($charge) {
+    global $db;
+
+    $orderId = $charge['metadata']['orderId'] ?? null;
+    if (!$orderId) return;
+
+    $failureReason = $charge['failure_reason'] ?? 'Unknown error';
+
+    $stmt = $db->prepare(
+        "UPDATE transactions SET status = 'failed', updated_at = NOW() WHERE order_id = ?"
+    );
+    $stmt->bind_param('s', $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    Logger::warning("Coinbase payment failed for order: $orderId - $failureReason");
+}
+
+// ===== Skrill Webhook Handler =====
+function handleSkrillWebhook($webhookData) {
+    global $db;
+
+    try {
+        // Verify Skrill signature
+        $secret = getenv('SKRILL_SECRET_KEY');
+        $receivedSignature = $_SERVER['HTTP_X_SKRILL_SIGNATURE'] ?? '';
+
+        $payload = file_get_contents('php://input');
+        $expectedSig = hash_hmac('md5', $payload, $secret);
+
+        if ($expectedSig !== $receivedSignature) {
+            throw new Exception('Invalid Skrill signature');
+        }
+
+        Logger::info("Skrill webhook received");
+
+        // Skrill sends status via GET/POST with transaction_id
+        $transactionId = $webhookData['transaction_id'] ?? null;
+        $status = $webhookData['status'] ?? null;
+
+        if (!$transactionId) return;
+
+        // Query order by transaction_id
+        $result = $db->query("SELECT order_id FROM transactions WHERE transaction_id = '$transactionId'");
+        if ($row = $result->fetch_assoc()) {
+            $orderId = $row['order_id'];
+
+            // Skrill status: 2 = SUCCESS, -1 = FAILED, 0 = PENDING
+            if ($status == '2') {
+                handleSkrillPaymentSuccess($orderId, $transactionId);
+            } else {
+                handleSkrillPaymentFailed($orderId, $status);
+            }
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        Logger::error("Skrill webhook error: " . $e->getMessage());
+        http_response_code(403);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+}
+
+function handleSkrillPaymentSuccess($orderId, $transactionId) {
+    global $db;
+
+    $stmt = $db->prepare(
+        "UPDATE transactions SET status = 'completed', transaction_id = ?, updated_at = NOW() WHERE order_id = ?"
+    );
+    $stmt->bind_param('ss', $transactionId, $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    $result = $db->query("SELECT email, amount FROM transactions WHERE order_id = '$orderId'");
+    if ($row = $result->fetch_assoc()) {
+        sendConfirmationEmail($row['email'], $orderId, $row['amount']);
+        Logger::info("Skrill payment completed for order: $orderId");
+    }
+}
+
+function handleSkrillPaymentFailed($orderId, $status) {
+    global $db;
+
+    $statusMap = [
+        '-1' => 'Failed',
+        '0' => 'Pending',
+        '-3' => 'Cancelled'
+    ];
+
+    $statusText = $statusMap[$status] ?? 'Unknown status';
+
+    $stmt = $db->prepare(
+        "UPDATE transactions SET status = 'failed', updated_at = NOW() WHERE order_id = ?"
+    );
+    $stmt->bind_param('s', $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    Logger::warning("Skrill payment failed for order: $orderId - Status: $statusText");
+}
+
+// ===== Flutterwave Webhook Handler =====
+function handleFlutterwaveWebhook($webhookData) {
+    global $db;
+
+    try {
+        // Verify Flutterwave signature
+        $secret = getenv('FLUTTERWAVE_SECRET_HASH');
+        $receivedHash = $_SERVER['HTTP_VERIFF_HASH'] ?? $_SERVER['HTTP_X_FLUTTERWAVE_SIGNATURE'] ?? '';
+
+        $payload = file_get_contents('php://input');
+        $expectedHash = hash_hmac('sha256', $payload, $secret);
+
+        if ($expectedHash !== $receivedHash) {
+            throw new Exception('Invalid Flutterwave signature');
+        }
+
+        Logger::info("Flutterwave webhook received");
+
+        // Webhook event types: charge.completed, charge.failed, etc.
+        if ($webhookData['data']['status'] === 'successful') {
+            handleFlutterwavePaymentSuccess($webhookData['data']);
+        } else {
+            handleFlutterwavePaymentFailed($webhookData['data']);
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        Logger::error("Flutterwave webhook error: " . $e->getMessage());
+        http_response_code(403);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+}
+
+function handleFlutterwavePaymentSuccess($chargeData) {
+    global $db;
+
+    // Get order ID from metadata or transaction reference
+    $transactionRef = $chargeData['tx_ref'] ?? null;
+    if (!$transactionRef) return;
+
+    $flutterwaveId = $chargeData['id'] ?? null;
+    $amount = $chargeData['amount'] ?? 0;
+
+    // Find order by transaction reference
+    $result = $db->query("SELECT order_id, email FROM transactions WHERE transaction_id = '$transactionRef' OR order_id = '$transactionRef'");
+    if ($row = $result->fetch_assoc()) {
+        $orderId = $row['order_id'];
+
+        $stmt = $db->prepare(
+            "UPDATE transactions SET status = 'completed', transaction_id = ?, updated_at = NOW() WHERE order_id = ?"
+        );
+        $stmt->bind_param('ss', $flutterwaveId, $orderId);
+        $stmt->execute();
+        $stmt->close();
+
+        sendConfirmationEmail($row['email'], $orderId, $amount);
+        Logger::info("Flutterwave payment completed for order: $orderId");
+    }
+}
+
+function handleFlutterwavePaymentFailed($chargeData) {
+    global $db;
+
+    $transactionRef = $chargeData['tx_ref'] ?? null;
+    if (!$transactionRef) return;
+
+    $failureReason = $chargeData['processor_response'] ?? 'Payment failed';
+
+    // Find order by transaction reference
+    $result = $db->query("SELECT order_id FROM transactions WHERE transaction_id = '$transactionRef' OR order_id = '$transactionRef'");
+    if ($row = $result->fetch_assoc()) {
+        $orderId = $row['order_id'];
+
+        $stmt = $db->prepare(
+            "UPDATE transactions SET status = 'failed', updated_at = NOW() WHERE order_id = ?"
+        );
+        $stmt->bind_param('s', $orderId);
+        $stmt->execute();
+        $stmt->close();
+
+        Logger::warning("Flutterwave payment failed for order: $orderId - $failureReason");
+    }
+}
+
+// ===== Cash App Webhook Handler =====
+function handleCashAppWebhook($webhookData) {
+    global $db;
+
+    try {
+        // Verify Cash App signature
+        $webhookSecret = getenv('CASHAPP_WEBHOOK_SECRET');
+        $receivedSignature = $_SERVER['HTTP_X_SQUARE_HMAC_SHA256'] ?? '';
+        
+        $payload = file_get_contents('php://input');
+        $expectedSignature = base64_encode(hash_hmac('sha256', $payload, $webhookSecret, true));
+
+        if (!hash_equals($expectedSignature, $receivedSignature)) {
+            throw new Exception('Invalid Cash App signature');
+        }
+
+        Logger::info("Cash App webhook received: {$webhookData['type']}");
+
+        // Handle different webhook event types
+        $eventType = $webhookData['type'] ?? '';
+        
+        if ($eventType === 'payment.updated') {
+            $paymentData = $webhookData['data']['object']['payment'] ?? null;
+            
+            if ($paymentData) {
+                if ($paymentData['status'] === 'COMPLETED') {
+                    handleCashAppPaymentSuccess($paymentData);
+                } elseif (in_array($paymentData['status'], ['CANCELED', 'FAILED'])) {
+                    handleCashAppPaymentFailed($paymentData);
+                }
+            }
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        Logger::error("Cash App webhook error: " . $e->getMessage());
+        http_response_code(403);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+}
+
+function handleCashAppPaymentSuccess($paymentData) {
+    global $db;
+
+    $paymentId = $paymentData['id'] ?? null;
+    $referenceId = $paymentData['reference_id'] ?? null;
+    
+    if (!$paymentId || !$referenceId) return;
+
+    // Extract order ID from reference
+    $orderId = explode('-', $referenceId)[0] . '-' . explode('-', $referenceId)[1];
+
+    $stmt = $db->prepare(
+        "UPDATE transactions SET status = 'completed', transaction_id = ?, updated_at = NOW() WHERE order_id = ?"
+    );
+    $stmt->bind_param('ss', $paymentId, $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    // Also update orders table if exists
+    $stmt = $db->prepare(
+        "UPDATE orders SET status = 'completed', payment_processor_reference = ? WHERE order_id = ?"
+    );
+    $stmt->bind_param('ss', $paymentId, $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    // Get order details and send confirmation
+    $result = $db->query("SELECT email, amount FROM transactions WHERE order_id = '$orderId'");
+    if ($row = $result->fetch_assoc()) {
+        sendConfirmationEmail($row['email'], $orderId, $row['amount']);
+        Logger::info("Cash App payment completed for order: $orderId");
+    }
+}
+
+function handleCashAppPaymentFailed($paymentData) {
+    global $db;
+
+    $paymentId = $paymentData['id'] ?? null;
+    $referenceId = $paymentData['reference_id'] ?? null;
+    $failureReason = $paymentData['failure_reason'] ?? 'Unknown reason';
+    
+    if (!$paymentId || !$referenceId) return;
+
+    // Extract order ID from reference
+    $orderId = explode('-', $referenceId)[0] . '-' . explode('-', $referenceId)[1];
+
+    $stmt = $db->prepare(
+        "UPDATE transactions SET status = 'failed', updated_at = NOW() WHERE order_id = ?"
+    );
+    $stmt->bind_param('s', $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    // Also update orders table if exists
+    $stmt = $db->prepare(
+        "UPDATE orders SET status = 'failed' WHERE order_id = ?"
+    );
+    $stmt->bind_param('s', $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    Logger::warning("Cash App payment failed for order: $orderId - $failureReason");
+}
+
 ?>

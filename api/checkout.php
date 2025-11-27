@@ -17,6 +17,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/payments.php';
 require_once __DIR__ . '/utils/security.php';
 require_once __DIR__ . '/utils/logger.php';
+require_once __DIR__ . '/payment-processor.php';
 
 // ===== Configuration =====
 define('DEBUG_MODE', false);
@@ -24,15 +25,30 @@ define('ORDER_TIMEOUT', 3600); // 1 hour
 
 // ===== CORS & Request Validation =====
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: https://www.davetopup.com');
+    // Allow from localhost, dev, and production
+    $allowedOrigins = ['https://www.davetopup.com', 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1', 'http://localhost'];
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if (in_array($origin, $allowedOrigins) || preg_match('/localhost/', $origin)) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+    }
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
     http_response_code(200);
     exit;
 }
 
-// Enforce HTTPS
-if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+// Allow CORS for all requests (dev mode)
+$allowedOrigins = ['https://www.davetopup.com', 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1', 'http://localhost'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins) || preg_match('/localhost/', $origin)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+}
+
+// Allow HTTP in development
+$isProduction = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+$isDevelopment = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', 'localhost:8000']);
+
+if ($isProduction && (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off')) {
     sendErrorResponse('HTTPS required', 403);
 }
 
@@ -95,36 +111,44 @@ try {
 
     switch ($paymentMethod) {
         case 'stripe':
-            $response = handleStripePayment($orderId, $sanitizedData);
+            $response = processStripePayment($orderId, $sanitizedData);
             break;
 
         case 'stripe-apple':
-            $response = handleApplePayment($orderId, $sanitizedData);
+        case 'apple-pay':
+            $response = processAppleGooglePayment($orderId, $sanitizedData, 'apple');
             break;
 
         case 'google-pay':
-            $response = handleGooglePayPayment($orderId, $sanitizedData);
+            $response = processAppleGooglePayment($orderId, $sanitizedData, 'google');
             break;
 
         case 'paypal':
-            $response = handlePayPalPayment($orderId, $sanitizedData);
+            $response = processPayPalPayment($orderId, $sanitizedData);
             break;
 
         case 'binance':
-            $response = handleBinancePayment($orderId, $sanitizedData);
+            $response = processBinancePayment($orderId, $sanitizedData);
             break;
 
         case 'coinbase':
-            $response = handleCoinbasePayment($orderId, $sanitizedData);
+            $response = processCoinbasePayment($orderId, $sanitizedData);
             break;
 
         case 'crypto':
-            $response = handleCryptoPayment($orderId, $sanitizedData);
+            $response = processCryptoPayment($orderId, $sanitizedData);
             break;
 
         case 'skrill':
+            $response = processSkrillPayment($orderId, $sanitizedData);
+            break;
+
         case 'flutterwave':
-            $response = handleThirdPartyPayment($orderId, $sanitizedData, $paymentMethod);
+            $response = processFlutterwavePayment($orderId, $sanitizedData);
+            break;
+
+        case 'cashapp':
+            $response = processCashAppPayment($orderId, $sanitizedData);
             break;
 
         default:
@@ -155,18 +179,18 @@ function validateCheckoutData($data) {
         $sanitized['email'] = sanitizeEmail($data['email']);
     }
 
-    // Player ID validation
-    if (empty($data['playerId']) || strlen($data['playerId']) < 3 || strlen($data['playerId']) > 50) {
-        $errors[] = 'Invalid Player ID (3-50 characters)';
+    // Name validation (from frontend form)
+    if (empty($data['name']) || strlen($data['name']) < 2 || strlen($data['name']) > 100) {
+        $errors[] = 'Invalid name (2-100 characters)';
     } else {
-        $sanitized['playerId'] = sanitizeInput($data['playerId']);
+        $sanitized['name'] = sanitizeInput($data['name']);
     }
 
     // Country validation
-    if (empty($data['country']) || strlen($data['country']) !== 2) {
+    if (empty($data['country']) || strlen($data['country']) < 2 || strlen($data['country']) > 3) {
         $errors[] = 'Invalid country code';
     } else {
-        $sanitized['country'] = sanitizeInput($data['country']);
+        $sanitized['country'] = strtoupper(sanitizeInput($data['country']));
     }
 
     // Amount validation
@@ -188,13 +212,23 @@ function validateCheckoutData($data) {
     if (empty($data['currency'])) {
         $data['currency'] = 'USD';
     }
-    $sanitized['currency'] = sanitizeInput($data['currency']);
+    $sanitized['currency'] = strtoupper(sanitizeInput($data['currency']));
 
-    // Cart data
-    if (empty($data['cartData'])) {
-        $errors[] = 'Cart data missing';
-    } else {
-        $sanitized['cartData'] = $data['cartData']; // Validate cart items separately
+    // Product data (from shopping cart / index2.html)
+    if (!empty($data['productId'])) {
+        $sanitized['productId'] = sanitizeInput($data['productId']);
+    } else if (!empty($data['playerId'])) {
+        // Fallback for older API calls (topup player ID)
+        $sanitized['playerId'] = sanitizeInput($data['playerId']);
+    }
+
+    if (!empty($data['productName'])) {
+        $sanitized['productName'] = sanitizeInput($data['productName']);
+    }
+
+    // Cart data (optional - for multi-item orders)
+    if (!empty($data['cartData'])) {
+        $sanitized['cartData'] = $data['cartData'];
     }
 
     // Additional payment data (optional)
@@ -223,7 +257,19 @@ function handleStripePayment($orderId, $data) {
         require_once STRIPE_SDK_PATH . '/init.php';
         \Stripe\Stripe::setApiKey($stripeKey);
 
-        // Create Payment Intent
+        // Retrieve payment method details to detect card funding (debit/credit)
+        $cardFunding = null;
+        try {
+            $pm = \Stripe\PaymentMethod::retrieve($paymentMethodId);
+            if (!empty($pm) && !empty($pm->card) && !empty($pm->card->funding)) {
+                $cardFunding = $pm->card->funding; // 'debit', 'credit', 'prepaid', or null
+            }
+        } catch (\Exception $e) {
+            // Non-fatal: we can still proceed with the payment
+            Logger::warning("Could not retrieve PaymentMethod details: {$e->getMessage()}");
+        }
+
+        // Create Payment Intent (include card funding in metadata when available)
         $intent = \Stripe\PaymentIntent::create([
             'amount' => (int) ($data['amount'] * 100), // Convert to cents
             'currency' => strtolower($data['currency']),
@@ -234,6 +280,7 @@ function handleStripePayment($orderId, $data) {
                 'orderId' => $orderId,
                 'email' => $data['email'],
                 'playerId' => $data['playerId'],
+                'card_funding' => $cardFunding,
             ],
             'receipt_email' => $data['email'],
         ]);
@@ -241,6 +288,21 @@ function handleStripePayment($orderId, $data) {
         // Handle different intent statuses
         if ($intent->status === 'succeeded') {
             updateOrderStatus($orderId, 'completed', $intent->id);
+
+            // Persist card funding info to transactions table if available
+            if ($cardFunding) {
+                global $db;
+                $stmt = $db->prepare(
+                    "UPDATE transactions SET payment_method = ?, transaction_id = ?, status = ?, card_funding = ?, updated_at = NOW() WHERE order_id = ?"
+                );
+                if ($stmt) {
+                    $method = 'stripe';
+                    $stmt->bind_param('sssss', $method, $intent->id, $intent->status, $cardFunding, $orderId);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+            }
+
             sendConfirmationEmail($data['email'], $orderId, $data['amount']);
             return ['success' => true, 'message' => 'Payment successful'];
         } elseif ($intent->status === 'requires_action') {
@@ -495,27 +557,70 @@ function handleThirdPartyPayment($orderId, $data, $method) {
 function storePendingOrder($orderId, $data) {
     global $db;
 
+    // Try to insert into orders table (for product orders from index2.html)
     $stmt = $db->prepare(
-        "INSERT INTO transactions 
-        (order_id, email, player_id, country, payment_method, amount, currency, status, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+        "INSERT INTO orders 
+        (order_id, email, customer_name, country, payment_method, amount, currency, product_id, product_name, status, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
     );
 
     if (!$stmt) {
-        Logger::error("Prepare error: " . $db->error);
-        return false;
+        // Fallback: Try transactions table for player topup orders
+        $stmt = $db->prepare(
+            "INSERT INTO transactions 
+            (order_id, email, player_id, country, payment_method, amount, currency, status, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+        );
+
+        if (!$stmt) {
+            Logger::error("Prepare error: " . $db->error);
+            return false;
+        }
+
+        $status = 'pending';
+        $playerId = $data['playerId'] ?? 'N/A';
+        $result = $stmt->bind_param(
+            'ssssssds',
+            $orderId,
+            $data['email'],
+            $playerId,
+            $data['country'],
+            $data['paymentMethod'],
+            $data['amount'],
+            $data['currency'],
+            $status
+        );
+
+        if (!$result) {
+            Logger::error("Bind error: " . $stmt->error);
+            return false;
+        }
+
+        if (!$stmt->execute()) {
+            Logger::error("Execute error: " . $stmt->error);
+            return false;
+        }
+
+        $stmt->close();
+        return true;
     }
 
+    // Insert into orders table (primary path for index2.html product orders)
     $status = 'pending';
+    $productId = $data['productId'] ?? ($data['playerId'] ?? 'N/A');
+    $productName = $data['productName'] ?? 'Digital Product';
+
     $result = $stmt->bind_param(
-        'ssssssds',
+        'sssssssssS',
         $orderId,
         $data['email'],
-        $data['playerId'],
+        $data['name'] ?? 'Guest',
         $data['country'],
         $data['paymentMethod'],
         $data['amount'],
         $data['currency'],
+        $productId,
+        $productName,
         $status
     );
 
@@ -523,6 +628,15 @@ function storePendingOrder($orderId, $data) {
         Logger::error("Bind error: " . $stmt->error);
         return false;
     }
+
+    if (!$stmt->execute()) {
+        Logger::error("Execute error: " . $stmt->error);
+        return false;
+    }
+
+    $stmt->close();
+    return true;
+}
 
     $result = $stmt->execute();
     $stmt->close();
