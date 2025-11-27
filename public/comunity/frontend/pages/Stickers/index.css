@@ -1,0 +1,19 @@
+:root {
+  --bg-light: #f0f2f5;
+  --bg-dark: #121b22;
+  --chat-light: #fff;
+  --chat-dark: #1f2c34;
+}
+
+body.dark {
+  background-color: var(--bg-dark);
+  color: #fff;
+}
+
+.chat-window {
+  background-color: var(--chat-light);
+}
+
+body.dark .chat-window {
+  background-color: var(--chat-dark);
+}

@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HULU | Top-up — Dave</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    /* CSS from your provided code (unchanged) */
+    :root {
+      --bg: #f6faf7;
+      --card: #fff;
+      --muted: #9aa0a8;
+      --text: #16121a;
+      --accent: #6f4bd6;
+      --accent-2: #9b6df0;
+      --price-g: #8a8f00;
+      --promo: #9aa800;
+      --shadow: 0 8px 24px rgba(19,18,22,0.06);
+      --radius: 14px;
+      --footer-bg: #0f0e13;
+      --footer-text: #e9e7ec;
+      --muted-light: rgba(233,231,236,0.7);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.9));
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 2px 6px rgba(12,12,22,0.03);
+    }
+
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: #0d0d0d;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .menu-btn { background: none; border: none; cursor: pointer; }
+    .menu-content {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      width: 200px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    .menu-content li { list-style: none; }
+    .menu-content li a { display: block; padding: 10px 15px; color: #333; text-decoration: none; }
+    .menu-content li a:hover { background-color: #7b4bf0; color: white; }
+    .submenu { display: none; padding-left: 15px; }
+
+    /* Container & Product */
+    .container { max-width: 980px; margin: 20px auto; padding: 0 18px 40px; }
+    .product-title { font-size: 44px; font-weight: 800; margin: 22px 0 12px; color: #121019; }
+    .product-card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; padding: 14px; }
+    .media-wrap { position: relative; border-radius: 10px; overflow: hidden; height: 220px; background: #0b0b0b; display: flex; align-items: center; justify-content: center; }
+    .media-wrap img { max-width: 100%; height: 100%; object-fit: cover; }
+    .promo-badge { position: absolute; left: 12px; top: 12px; background: var(--promo); color: #fff; padding: 8px 12px; border-radius: 50px; font-weight: 700; font-size: 13px; }
+    .zoom-btn { position: absolute; right: 12px; top: 12px; width: 44px; height: 44px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(5,5,10,0.08); cursor: pointer; }
+    .price-row { display: flex; align-items: center; gap: 18px; margin: 16px 6px; flex-wrap: wrap; }
+    .price-main { font-size: 22px; font-weight: 700; color: var(--price-g); }
+    .price-sub { font-size: 16px; color: var(--muted); margin-left: 6px; }
+    .desc { color: #6e6b73; margin: 8px 6px 16px; }
+    form { margin: 0; padding: 0; }
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+    .select, input[type="text"] { flex: 1; min-width: 160px; padding: 14px 12px; border-radius: 10px; border: 1px solid rgba(12,12,18,0.08); background: #fff; font-size: 15px; outline: none; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; color: #29242f; }
+    .qty { width: 70px; padding: 12px; border-radius: 10px; border: 1px solid rgba(12,12,18,0.06); text-align: center; font-weight: 600; }
+    .btn-add { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; padding: 12px 18px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 12px 30px rgba(111,75,214,0.12); display: inline-flex; align-items: center; gap: 8px; }
+    .meta { margin-top: 14px; color: var(--muted); font-size: 13px; }
+    .tabs {
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background-color: white;
+    transition: background-color 0.3s;
+  }
+
+  .tab.active {
+    background-color: #d3d3d3; /* gri pou tab aktif */
+    font-weight: bold;
+  }
+
+  .tab-content {
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: none;
+    margin-top: -1px;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .section-title {
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: var(--muted, #666);
+    margin-top: 8px;}
+
+    /* Similar products */
+    .similar { max-width: 900px; margin: 40px auto; }
+    .similar h3 { margin-bottom: 15px; }
+    .similar-products { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+    .similar-products div { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 10px; text-align: center; }
+    .similar-products img { width: 100%; border-radius: 6px; }
+    .similar-products p { margin: 8px 0; font-size: 14px; font-weight: bold; }
+    .similar-products span { color: #2f855a; font-weight: bold; }
+    .similar-products a { display: inline-block; margin-top: 6px; background: #2f855a; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px; text-decoration: none; }
+    .similar-products a:hover { background: #276749; }
+
+    /* Chat floating button */
+    .chat { position: fixed; bottom: 25px; right: 25px; background: linear-gradient(135deg, #e50914, #b81d24); border: none; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s; }
+    .chat:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+
+    /* ===== FOOTER STYLE ===== */
+    footer { background: #0e1117; color: #e5e5e5; padding: 60px 20px 30px; font-family: "Poppins", sans-serif; }
+    .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; max-width: 1200px; margin: auto; }
+    .footer-col { flex: 1; min-width: 280px; }
+    .footer-brand .logo { font-size: 38px; font-weight: 700; color: #ff2a2a; letter-spacing: 1px; }
+    .footer-tag { font-size: 15px; font-weight: 500; margin-top: 6px; color: #f0f0f0; }
+    .socials { margin-top: 15px; display: flex; gap: 16px; }
+    .socials a { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: #fff; transition: all 0.3s ease; font-size: 18px; }
+    .socials a:hover { background: #ff2a2a; transform: translateY(-3px); }
+    .comment-box { background: rgba(255, 255, 255, 0.04); border-radius: 12px; padding: 16px; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .comment-box input, .comment-box textarea { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: #161b22; color: #e5e5e5; font-size: 14px; outline: none; transition: 0.3s; }
+    .comment-box input:focus, .comment-box textarea:focus { border-color: #ff2a2a; }
+    .comment-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-primary { background: #ff2a2a; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .btn-primary:hover { background: #e01f1f; }
+    .btn-ghost { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #ccc; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .btn-ghost:hover { border-color: #ff2a2a; color: #ff2a2a; }
+    .links-grid { display: flex; gap: 40px; flex-wrap: wrap; }
+    .links h4 { font-size: 16px; margin-bottom: 10px; color: #fff; }
+    .links a { display: block; font-size: 14px; color: #c0c0c0; margin-bottom: 6px; text-decoration: none; transition: 0.3s; }
+    .links a:hover { color: #ff2a2a; }
+    .footer-bottom { text-align: center; font-size: 14px; color: #999; margin-top: 40px; }
+    .footer-bottom a { color: #ff2a2a; text-decoration: none; font-weight: 500; }
+    .footer-bottom-links { display: flex; justify-content: center; gap: 18px; font-size: 13px; margin-top: 10px; }
+    .footer-bottom-links a { color: #999; text-decoration: none; transition: 0.3s; }
+    .footer-bottom-links a:hover { color: #ff2a2a; }
+
+    @media (max-width: 768px) {
+      .footer-inner { flex-direction: column; gap: 30px; }
+      .links-grid { flex-direction: column; gap: 20px; }
+      .footer-bottom, .footer-bottom-links { text-align: center; }
+    }
+
+.page-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--accent, #7b4bf0);
+  z-index: 9999;
+  opacity: 0;
+  transform: scale(1.1);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+
+.page-transition.active {
+  opacity: 1;
+  transform: scale(1);
+}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">Dave</div>
+    <h1>DAVETOPUP</h1>
+  </div>
+  <button class="menu-btn" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="2" y="2" width="8" height="8" rx="2" fill="#7b4bf0" opacity="0.95"/>
+      <rect x="14" y="2" width="8" height="8" rx="2" fill="#7b4bf0" opacity="0.6"/>
+      <rect x="2" y="14" width="8" height="8" rx="2" fill="#7b4bf0" opacity="0.6"/>
+      <rect x="14" y="14" width="8" height="8" rx="2" fill="#7b4bf0" opacity="0.95"/>
+    </svg>
+  </button>
+  <ul class="menu-content" id="menuContent">
+    <li><a href="index1.html">Accueil</a></li>
+    <li><a href="Support/Apple.html">Apple Card</a></li>
+    <li><a href="Support/exchange.html">Exchange</a></li>
+    <li><a href="Support/wallet.html">Mon Portefeuille</a></li>
+    <li><a href="Support/login.html">Paramètres</a></li>
+    <li>
+      <a href="#" id="supportLink">Support ▼</a>
+      <ul class="submenu" id="supportSubmenu">
+        <li><a href="Support/tuto.html">Tutoriel</a></li>
+        <li><a href="Support/assistant.html">Assistant</a></li>
+        <li><a href="Support/politique.html">Politique & Confidentialité</a></li>
+      </ul>
+    </li>
+  </ul>
+</header>
+
+  <main class="container">
+    <h2 class="product-title">HULU</h2>
+
+    <div class="product-card">
+      <div class="media-wrap" id="mediaWrap">
+        <div class="promo-badge">Promo !</div>
+        <img src="https://files.catbox.moe/qk7ajp.jpeg" alt="HULU" id="productImage">
+        <button class="zoom-btn" title="Voir l'image"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="#111" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </div>
+
+      <div class="price-row">
+        <div>
+          <div class="price-main" id="priceMain">USD 5.00 — G500.00</div>
+          <div class="price-sub">Gamme de prix : <span id="priceRange">USD 5.00 — USD 23.25 • G500.00 — G2,325.00</span></div>
+        </div>
+      </div>
+
+      <p class="desc">Carte Cadeau HULU — Le Cadeau Parfait pour les Amateurs de Divertissement. Offrez un accès illimité au divertissement via une carte cadeau HULU.</p>
+
+      <form id="productForm" onsubmit="return false;">
+        <div class="form-row">
+          <div style="flex:1;min-width:180px">
+            <label for="duration">Durée</label>
+            <select id="duration" class="select">
+              <option value="">Choisir une option</option>
+              <option value="1m" data-usd="5" data-g="500">1 mois — USD 5.00 — G500</option>
+              <option value="3m" data-usd="12" data-g="1200">3 mois — USD 12.00 — G1,200</option>
+              <option value="6m" data-usd="23.25" data-g="2325">6 mois — USD 23.25 — G2,325</option>
+            </select>
+          </div>
+
+          <div style="width:100px">
+            <label for="qty">Quantité</label>
+            <input id="qty" class="qty" type="number" min="1" value="1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div style="flex:1">
+            <label for="desiredName">Nom Désiré *</label>
+            <input id="desiredName" type="text" placeholder="Le nom du compte désiré">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div style="flex:1">
+            <label for="desiredCode">Code désiré *</label>
+            <input id="desiredCode" type="text" maxlength="4" placeholder="Code désiré (4 chiffres)">
+          </div>
+
+          <div style="display:flex;align-items:flex-end">
+            <button class="btn-add" id="addToCart">
+              <svg width="16" height="16" viewBox="0 0 24 24" style="opacity:0.95"><path d="M3 3h2l.4 2M7 13h10l3-8H6.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              Ajouter au panier
+            </button>
+          </div>
+        </div>
+
+        <div class="meta" id="openGiftCard">
+  UGS : ND • Catégorie : <strong style="color:var(--accent)">GiftCard</strong>
+</div>
+      </<div class="tabs">
+  <div class="tab active" data-tab="desc">Description</div>
+  <div class="tab" data-tab="info">Informations complémentaires</div>
+</div>
+
+<div id="desc" class="tab-content active">
+  <h3 class="section-title">Description</h3>
+  <p style="color:var(--muted)">Ex: Ce produit est livré rapidement et fonctionne dans toutes les zones US.</p>
+</div>
+
+<div id="info" class="tab-content">
+  <h3 class="section-title">Informations complémentaires</h3>
+  <p style="color:var(--muted)">Ex: Livraison instantanée par email / Code non remboursable / Compatible zones US.</p>
+</div>
+
+    <!-- PRODUITS SIMILAIRES -->
+<div class="similar">
+  <h3>Produits similaires</h3>
+  <div class="similar-products">
+    <div>
+      <img src="https://files.catbox.moe/luzeoi.jpeg">
+      <p>Netflix</p><span>Go?</span><br>
+      <a href="1.html">Voir</a>
+    </div>
+    <div>
+      <img src="https://files.catbox.moe/cedwal.jpeg">
+      <p>Amazon Prime</p><span>Go?</span><br>
+      <a href="3.html">Voir</a>
+    </div>
+    <div>
+      <img src="https://files.catbox.moe/q71bid.jpeg">
+      <p>Apple Tv+</p><span>Go?</span><br>
+      <a href="5.html">Voir</a>
+    </div>
+    <div>
+      <img src="https://files.catbox.moe/s53ll5.jpeg">
+      <p>HBO Max</p><span>Go?</span><br>
+      <a href="6.html">Voir</a>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <div class="logo">DV</div>
+          <div>
+            <div class="footer-tag">Dave Top Up : Rechargez Facilement, Jouez Sans Limites</div>
+            <div style="margin-top:6px;color:var(--muted-light)">Recharge et giftcards instantanées — service sécurisé.</div>
+
+            <!-- Footer Social Icons -->
+<div class="socials">
+  <a href="https://instagram.com/Dave" target="_blank" title="Instagram" aria-label="Instagram">
+    <i class="fab fa-instagram"></i>
+  </a>
+  <a href="https://facebook.com/DaveTopUp" target="_blank" title="Facebook" aria-label="Facebook">
+    <i class="fab fa-facebook"></i>
+  </a>
+  <a href="https://wa.me/50942241547" target="_blank" title="WhatsApp" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
+
+        <div class="comment-box" id="commentBox">
+          <strong style="color:var(--footer-text)">Leave a comment</strong>
+          <div style="margin-top:8px;font-size:13px;color:var(--muted-light)">Di nou sa ou panse — nou reponn vit.</div>
+          <input id="commentName" placeholder="Non ou (opsyonèl)" />
+          <textarea id="commentText" rows="3" placeholder="Ekri komantè w la..."></textarea>
+          <div class="comment-actions">
+            <button class="btn-ghost" id="clearComment">Clear</button>
+            <button class="btn-primary" id="sendComment">Send Comment</button>
+            <div id="commentStatus" style="margin-left:8px;color:var(--muted-light);font-size:13px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="links-grid">
+          <div class="links">
+            <h4>Quick Link</h4>
+            <a href="#">e-football</a>
+            <a href="Support/Apple.html">Apple Carte</a>
+            <a href="TopUp/1.html">Free Fire</a>
+            <a href="TopUp/2.html">PUBG</a>
+          </div>
+
+          <div class="links">
+            <h4>Visit</h4>
+            <a href="#">Accueil</a>
+            <a href="index3.html">Shop</a>
+            <a href="#">Contact</a>
+            <a href="#">Mon Compte</a>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;color:var(--muted-light)">
+          <strong>Kontakte nou</strong>
+          <div style="margin-top:8px">Email: support@davetopup.com</div>
+          <div style="margin-top:6px">Téléphone / WhatsApp: +50942241547</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+  © 2025 <a href="https://lerichetopup.com">Dave Top Up</a> — Rechargez Facilement, Jouez Sans Limites.
+</div>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <button class="chat" title="Support" onclick="window.open('Film-bot.html', '_blank')">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+      stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</button>
+
+  <script>
+    /* === Configuration: ranplase API_BASE ak endpoint reyèl ou === */
+    const API_BASE = 'https://example.com/api'; // <- mete endpoint ou la
+
+    // DOM eleman
+    const duration = document.getElementById('duration');
+    const priceMain = document.getElementById('priceMain');
+    const priceRange = document.getElementById('priceRange');
+    const addBtn = document.getElementById('addToCart');
+    const qtyInput = document.getElementById('qty');
+    const desiredName = document.getElementById('desiredName');
+    const desiredCode = document.getElementById('desiredCode');
+
+    const commentName = document.getElementById('commentName');
+    const commentText = document.getElementById('commentText');
+    const sendCommentBtn = document.getElementById('sendComment');
+    const clearCommentBtn = document.getElementById('clearComment');
+    const commentStatus = document.getElementById('commentStatus');
+
+    const menuBtn = document.querySelector('.menu-btn');
+    const menuContent = document.getElementById('menuContent');
+    const supportLink = document.getElementById('supportLink');
+    const supportSubmenu = document.getElementById('supportSubmenu');
+
+    const yearEl = document.getElementById('year'); 
+    if(yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // default ranges
+    const defaultRange = { usdMin:5.00, usdMax:23.25, gMin:500, gMax:2325 };
+
+    function updatePriceText(usd,g){
+      priceMain.textContent = `USD ${Number(usd).toFixed(2)} — G${Number(g).toLocaleString()}`;
+      priceRange.textContent = `USD ${defaultRange.usdMin.toFixed(2)} — USD ${defaultRange.usdMax.toFixed(2)} • G${defaultRange.gMin.toLocaleString()} — G${defaultRange.gMax.toLocaleString()}`;
+    }
+    if(duration){
+      duration.addEventListener('change', () => {
+        const sel = duration.selectedOptions[0];
+        if(!sel || !sel.dataset.usd) { updatePriceText(defaultRange.usdMin, defaultRange.gMin); return; }
+        updatePriceText(sel.dataset.usd, sel.dataset.g);
+      });
+    }
+
+    // --- Add to cart / Create new code via API ---
+    if(addBtn){
+      addBtn.addEventListener('click', async () => {
+        const qty = Number(qtyInput.value) || 1;
+        const name = desiredName.value.trim();
+        const code = desiredCode.value.trim();
+        if(!duration.value){ alert('Veuillez choisir une durée.'); duration.focus(); return; }
+        if(!name){ alert('Veuillez indiquer le nom désiré.'); desiredName.focus(); return; }
+        if(!/^\d{4}$/.test(code)){ alert('Le code désiré doit être composé de 4 chiffres.'); desiredCode.focus(); return; }
+
+        const sel = duration.selectedOptions[0];
+        const usd = Number(sel.dataset.usd);
+        const g = Number(sel.dataset.g);
+
+        const payload = {
+          product: 'HULU',
+          duration: duration.value,
+          unitPriceUSD: usd,
+          unitPriceG: g,
+          qty,
+          desiredName: name,
+          desiredCode: code
+        };
+
+        addBtn.disabled = true; addBtn.textContent = 'Processing...';
+
+        try {
+          const res = await fetch(`${API_BASE}/create-code`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+
+          if(!res.ok){
+            const txt = await res.text();
+            throw new Error(`Server error: ${res.status} ${txt}`);
+          }
+
+          const data = await res.json();
+          if(data && data.success){
+            const generated = data.generatedCode || '—';
+            alert(`Ajouté & Code généré:\nQuantité: ${qty}\nTotal: USD ${(usd*qty).toFixed(2)} — G${(g*qty).toLocaleString()}\nCode: ${generated}\nMessage: ${data.message || 'Succès'}`);
+          } else {
+            throw new Error(data.message || 'Erreur lors de la génération du code');
+          }
+        } catch(err){
+          console.error(err);
+          alert('Erreur: ' + err.message);
+        } finally {
+          addBtn.disabled = false;
+          addBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" style="opacity:0.95"><path d="M3 3h2l.4 2M7 13h10l3-8H6.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Ajouter au panier';
+        }
+      });
+    }
+
+    // === Comment send ===
+    if(clearCommentBtn){
+      clearCommentBtn.addEventListener('click', () => {
+        commentName.value=''; commentText.value=''; commentStatus.textContent='';
+      });
+    }
+
+    if(sendCommentBtn){
+      sendCommentBtn.addEventListener('click', async () => {
+        const name = commentName.value.trim() || 'Anonyme';
+        const text = commentText.value.trim();
+        if(!text){ commentStatus.textContent = 'Please write a comment.'; return; }
+        commentStatus.textContent = 'Sending...';
+        sendCommentBtn.disabled = true;
+        try{
+          const payload = { product: 'HULU', name, text, date: new Date().toISOString() };
+          const r = await fetch(`${API_BASE}/comments`, {
+            method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+          });
+          if(!r.ok){ throw new Error('Failed to send comment'); }
+          const data = await r.json();
+          if(data && data.success){
+            commentStatus.textContent = 'Merci! Votre commentaire est publié.';
+            commentText.value=''; commentName.value='';
+          } else {
+            throw new Error(data.message || 'Erreur');
+          }
+        }catch(e){
+          console.error(e);
+          commentStatus.textContent = 'Erreur lè voye. Eseye ankò.';
+        }finally{
+          sendCommentBtn.disabled = false;
+          setTimeout(()=>{ commentStatus.textContent = ''; }, 4000);
+        }
+      });
+    }
+
+    // Zoom image
+    const zoomBtn = document.querySelector('.zoom-btn');
+    if(zoomBtn){
+      zoomBtn.addEventListener('click', () => {
+        const img = document.getElementById('productImage').src;
+        window.open(img, '_blank');
+      });
+    }
+
+    // Chat button placeholder
+    const chatBtn = document.querySelector('.chat');
+    if(chatBtn){
+      chatBtn.addEventListener('click', () => {
+        window.location.href = 'Film-bot.html';
+      });
+    }
+
+    // --- MENU TOGGLE ---
+    if(menuBtn && menuContent){
+      menuBtn.addEventListener('click', () => {
+        menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
+      });
+    }
+
+    if(supportLink && supportSubmenu){
+      supportLink.addEventListener('click', (e)=>{
+        e.preventDefault();
+        supportSubmenu.style.display = supportSubmenu.style.display === 'block' ? 'none' : 'block';
+      });
+    }
+
+    // Optional: close menu if clicked outside
+    document.addEventListener('click', (e)=>{
+      if(menuContent && !menuContent.contains(e.target) && menuBtn && !menuBtn.contains(e.target)){
+        menuContent.style.display = 'none';
+      }
+    });
+
+    // initial price
+    updatePriceText(defaultRange.usdMin, defaultRange.gMin);
+
+document.getElementById("openGiftCard").addEventListener("click", function() {
+  const transition = document.createElement("div");
+  transition.classList.add("page-transition");
+  document.body.appendChild(transition);
+
+  // Anime efè a
+  setTimeout(() => {
+    transition.classList.add("active");
+  }, 10);
+
+  // Apre efè a, ale sou paj la
+  setTimeout(() => {
+    window.location.href = "giftcard-page.html";
+  }, 700);
+})
+
+const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Retire "active" nan tout tab ak kontni
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+
+      // Ajoute "active" nan tab ak kontni ki klike a
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAWENS SHOP | Compte Lvl 78</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body, h1,h2,h3,h4,p,ul,li,a,button { margin:0; padding:0; font-family: 'Poppins', Arial, sans-serif; }
+ul { list-style:none; }
+a { text-decoration:none; color:inherit; }
+
+/* HEADER */
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 20px; 
+  background: linear-gradient(90deg,#ff8a00,#ff2079);
+  position:fixed; top:0; width:100%; z-index:100;
+  color:#fff;
+}
+header .logo img { height:50px; }
+.back-btn { font-size:24px; background:none; border:none; cursor:pointer; color:#fff; }
+
+/* MAIN */
+main { padding:20px; margin-top:80px; max-width:1000px; margin-left:auto; margin-right:auto; }
+.product-container { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+.left-column, .right-column { flex:1; min-width:280px; }
+
+.main-img { width:100%; max-width:500px; height:400px; border-radius:12px; object-fit:cover; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.thumbnail-grid { display:flex; justify-content:flex-start; gap:10px; margin-top:10px; }
+.thumbnail-grid img { width:80px; height:80px; border-radius:10px; object-fit:cover; cursor:pointer; border:2px solid transparent; transition:0.2s; }
+.thumbnail-grid img:hover { border-color:#ff2079; transform:scale(1.05); }
+
+/* INFO */
+.account-info h2 { color:#ff2079; margin-bottom:12px; }
+.account-info p { color:#555; margin-bottom:6px; font-size:14px; }
+.price { font-size:22px; font-weight:700; color:#ff2079; margin:12px 0; }
+
+/* BUTTONS */
+.btn { display:inline-block; padding:12px 20px; background:#ff2079; color:#fff; border-radius:8px; font-weight:600; margin:8px 5px 8px 0; cursor:pointer; transition:0.3s; }
+.btn:hover { background:#ff8a00; }
+
+/* SIMILAR PRODUCTS */
+.similar-products { margin-top:50px; }
+.similar-products h3 { color:#ff2079; margin-bottom:20px; text-align:center; }
+.similar-grid { display:grid; gap:20px; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); }
+
+/* CARD STYLE */
+.card {
+  background:#fff; padding:15px; border-radius:12px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.08);
+  text-align:center;
+  transition:0.3s;
+}
+.card img { width:100%; height:135px; border-radius:10px; object-fit:cover; }
+.card h4 { font-size:14px; margin:8px 0; color:#333; }
+.card p { font-size:12px; color:#777; margin-bottom:6px; }
+.card .price { font-size:16px; color:#ff2079; font-weight:600; }
+
+/* FOOTER */
+footer { margin-top:50px; text-align:center; padding:20px; color:#777; background:#f9f9f9; border-top:1px solid #ddd; }
+.footer-owner img { width:40px; height:40px; border-radius:50%; object-fit:cover; }
+.footer-owner { display:flex; justify-content:center; align-items:center; gap:15px; flex-wrap:wrap; }
+.footer-owner a { color:#ff2079; font-weight:600; }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+  .product-container { flex-direction:column; align-items:center; }
+  .left-column, .right-column { width:100%; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <a href="page1.html"><img src="https://files.catbox.moe/gt8dvw.png"></a>
+  </div>
+  <button class="back-btn" onclick="window.history.back();"><i class="fa-solid fa-arrow-left"></i></button>
+</header>
+
+<main>
+<div class="product-container">
+  <!-- LEFT COLUMN -->
+  <div class="left-column">
+    <img id="mainImage" class="main-img" src="https://files.catbox.moe/ovcb0d.jpeg">
+    <div class="thumbnail-grid">
+      <img src="https://files.catbox.moe/ovcb0d.jpeg" onclick="changeImage(this)">
+      <img src="https://files.catbox.moe/y93rnm.jpeg" onclick="changeImage(this)">
+      <img src="https://files.catbox.moe/gl69q1.jpeg" onclick="changeImage(this)">
+      <img src="https://files.catbox.moe/2d8rm5.png" onclick="changeImage(this)">
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-column">
+    <div class="account-info">
+      <h2>Compte Lvl 78 • 600+ Skins Veterano 6ans</h2>
+      <p><b>Level:</b> 78</p>
+      <p><b>Skins:</b> 600+</p>
+      <p><b>Armes Spéciales:</b> Scar, MP40, M1014...</p>
+      <p><b>VIP:</b> Veterano</p>
+      <p class="price">$225.99</p>
+    </div>
+    <a href="https://wa.me/1234567890" class="btn" target="_blank"><i class="fab fa-whatsapp"></i> Siw renmen, WhatsApp</a>
+    <a href="checkout.html" class="btn" onclick="saveProduct()"><i class="fa-solid fa-cart-shopping"></i> Go to Checkout</a>
+  </div>
+</div>
+
+<!-- SIMILAR PRODUCTS -->
+<div class="similar-products">
+  <h3>Produits Similaires</h3>
+  <div class="similar-grid">
+    <div class="card">
+      <img src="https://files.catbox.moe/y93rnm.jpeg">
+      <h4>Compte Lvl 75 • 500+ Skins</h4>
+      <p class="price">$125.78</p>
+      <a href="acc80.html" class="btn">Voir le compte</a>
+    </div>
+    <div class="card">
+      <img src="https://files.catbox.moe/gl69q1.jpeg">
+      <h4>Compte Lvl 73 • 650+ Skins</h4>
+      <p class="price">$190-240</p>
+      <a href="acc90.html" class="btn">Voir le compte</a>
+    </div>
+    <div class="card">
+      <img src="https://files.catbox.moe/2d8rm5.png">
+      <h4>Compte Lvl 75 • 800+ Skins</h4>
+      <p class="price">$300-350</p>
+      <a href="acc100.html" class="btn">Voir le compte</a>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="footer-owner">
+    <img src="https://files.catbox.moe/gt8dvw.png">
+    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+    <a href="#"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <span><b style="color:#ff2079;">DAWENS SHOP</b></span>
+  </div>
+  <p>© 2025 DAWENS SHOP — Tous droits réservés.</p>
+</footer>
+
+<script>
+function changeImage(img){
+  document.getElementById('mainImage').src = img.src;
+}
+
+// Save product to localStorage for checkout
+function saveProduct() {
+    const product = {
+        title: "Compte Lvl 78 • 600+ Skins Veterano 6ans",
+        price: "$225.99",
+        img: document.getElementById("mainImage").src,
+        level: 78,
+        skins: "600+",
+        vip: "Veterano",
+        armes: "Scar, MP40, M1014..."
+    };
+    localStorage.setItem("selectedProduct", JSON.stringify(product));
+}
+</script>
+
+</body>
+</html>

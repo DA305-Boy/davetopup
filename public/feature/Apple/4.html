@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>iTunes Gift Card Store</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    :root {
+      --accent: #2b9ed8;
+      --bg: #f7f8fb;
+      --card: #fff;
+    }
+
+    body {
+      font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      color: #111;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #4fd3c4, #5aa3e6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1100px;
+      margin: 20px auto;
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      justify-items: center;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(15, 15, 15, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 240px;
+    }
+
+    .art img {
+      width: 100%;
+      border-radius: 8px;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .old-price {
+  color: #777;
+  font-size: 13px;
+  text-decoration: line-through;
+  margin-top: -4px;
+}
+
+    .promo {
+  color: #10B981; /* vèt promo */
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: -2px;
+}
+
+    .meta {
+      color: #666;
+    }
+
+    .actions {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    button.add {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .cart-btn {
+      position: relative;
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #f43;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 6px;
+    }
+
+    .cart-panel {
+      position: fixed;
+      right: 20px;
+      top: 74px;
+      width: 320px;
+      max-height: 70vh;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      overflow: auto;
+      padding: 12px;
+      display: none;
+      z-index: 50;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 10px;
+      padding: 8px 6px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .cart-item img {
+      width: 56px;
+      height: 46px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 6px;
+    }
+
+    .checkout {
+      display: block;
+      text-align: center;
+      background: #111;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+  footer {
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+  text-align: center;
+  padding: 25px 10px;
+  margin-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+footer .social-icons {
+  margin-bottom: 12px;
+}
+
+footer .social-icons a {
+  margin: 0 10px;
+  font-size: 26px;
+  color: #ffffff;
+  transition: 0.3s ease;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+footer .social-icons a:nth-child(1):hover {
+  color: #1877F2; /* Facebook */
+  text-shadow: 0 0 10px #1877F2;
+}
+
+footer .social-icons a:nth-child(2):hover {
+  color: #25D366; /* WhatsApp */
+  text-shadow: 0 0 10px #25D366;
+}
+
+footer p {
+  color: #e6e6e6;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+footer strong {
+  color: #00eaff;
+  text-shadow: 0 0 10px #00eaff;
+}
+
+.country-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  background: white;
+  font-size: 14px;
+}
+
+.country-box img.flag {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+}
+
+.country-box .arrow {
+  margin-left: auto;
+  font-size: 12px;
+  color: #444;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.40);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 420px;
+  margin: 70px auto;
+  border-radius: 14px;
+  padding: 15px 0;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 18px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.close {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.search {
+  width: 85%;
+  margin: 15px auto;
+  display: block;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.country-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  cursor: pointer;
+}
+
+.country-item img {
+  width: 22px;
+  height: 22px;
+}
+
+.country-item:hover {
+  background: #f5f5f5;
+}
+
+/* Cards container */
+.cards {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #eee;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.card span {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* === CAROUSEL MARQUEE === */
+.carousel-marquee {
+  width: 100%;
+  overflow: hidden; /* kache tras la */
+  background: #fff;
+  padding: 5px 0;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 15px; /* espas ant imaj yo */
+  animation: marquee 12s linear infinite;
+  white-space: nowrap; /* pa kase nan liy */
+}
+
+.carousel-track img {
+  width: 40px;
+  height: 30px;
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  flex-shrink: 0; /* pa pèmèt imaj yo vin pi piti */
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-55%); } /* deplase mwatye pou li san gap */
+}
+
+/* === WHY CHOOSE US SECTION === */
+.section-title{
+  font-size: 26px;
+  font-weight: 700;
+  color: #2b6cb0;
+  text-align: center;
+  margin: 50px 0 20px;
+}
+
+.why-card{
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 25px;
+  max-width: 900px;
+  margin: 0 auto 60px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+.feature{
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid #eee;
+}
+.feature:last-child{ border-bottom: none; }
+
+.icon{
+  min-width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #f0f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon svg{ width: 30px; height: 30px; }
+
+.content h3{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+.content p{
+  color: #555;
+  font-size: 14px;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+.product-details {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.08);
+  font-family: "Poppins", sans-serif;
+}
+
+.product-details h2 {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.pd-block {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  border-left: 3px solid #007bff;
+}
+
+.pd-block h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #0056d6;
+}
+
+.pd-block p,
+.pd-block li {
+  color: #444;
+  line-height: 1.6;
+}
+
+.pd-block ol {
+  padding-left: 20px;
+}
+
+.pd-image {
+  margin: 25px 0;
+  text-align: center;
+}
+
+.pd-image img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+.product-extra {
+  margin-top: 25px;
+  font-family: "Poppins", sans-serif;
+}
+
+/* 🌈 PREMIUM BLOCK */
+.pe-block {
+  background: linear-gradient(135deg, #ffffffcc, #f7f9ffcc);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.07);
+  border-left: 4px solid #6a5af9; /* Violet accent */
+}
+
+/* 🟣 TITLES */
+.pe-block h3 {
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #4a3df5;      /* Soft Royal Violet */
+  font-weight: 600;
+}
+
+.pe-block h4 {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  font-size: 16px;
+  color: #2f2f2f;
+  font-weight: 500;
+}
+
+/* ✨ TEXT */
+.pe-block p,
+.pe-block li {
+  color: #3a3a3a;
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+/* LIST */
+.pe-block ol {
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+/* ⚠️ WARNING (Gold) */
+.pe-block.warning {
+  background: linear-gradient(135deg, #fff6d9, #fff2c2);
+  border-left: 4px solid #f5b300;
+  box-shadow: 0 8px 20px rgba(255,200,0,0.15);
+}
+
+.pe-block.warning h3 {
+  color: #d69200;
+}
+
+/* ❌ DANGER (Red Gradient) */
+.pe-block.danger {
+  background: linear-gradient(135deg, #ffe5e5, #ffd7d7);
+  border-left: 4px solid #ff2d2d;
+  box-shadow: 0 8px 20px rgba(255,0,0,0.12);
+}
+
+.pe-block.danger h3 {
+  color: #c90000;
+}
+
+.extra-benefits {
+  margin-top: 25px;
+  font-family: "Poppins", sans-serif;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background: #f9f9f9;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  border-left: 4px solid #e63946; /* Accent rouge */
+}
+
+.benefit-item i {
+  font-size: 28px;
+  color: #e63946; /* Icon color matching titles */
+  margin-top: 4px;
+}
+
+.benefit-text h4 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  color: #e63946;
+  font-weight: 600;
+}
+
+.benefit-text p {
+  margin: 0;
+  font-size: 15px;
+  color: #444;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">P.U.B</div>
+      <div>
+        <div class="title">P.U.B.G G-Coin</div>
+        <div style="color:#666;font-size:13px">Safe & fast top-up · 7-day guarantee</div>
+      </div>
+    </div>
+
+    <!-- SELECT COUNTRY BUTTON -->
+<div class="controls">
+  <label style="font-size:13px;color:#444">G-Coin</label>
+
+  <div class="country-box" id="openCountry">
+    <img src="https://files.catbox.moe/vusmd5.webp" class="flag">
+    <span id="selectedG-CoinText">G-Coin</span>
+    <span class="arrow">▼</span>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="countryModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h3>Select G-Coin</h3>
+    </div>
+
+    <input type="text" class="search" placeholder="Search country...">
+
+    <div class="G-Coin-list" id="GCoinList"></div>
+  </div>
+</div>
+
+<!-- PLACE WHERE CARDS WILL LOAD -->
+<div id="cardsContainer" class="cards"></div>
+      <button class="cart-btn" id="openCart">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6h15l-1.5 9h-11L6 6z" stroke="#111" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="10.5" cy="19" r="1.2" fill="#111"/>
+          <circle cx="18.5" cy="19" r="1.2" fill="#111"/>
+        </svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div style="margin-bottom:10px;color:#444">Select a P.U.B.G G-Coin to update card images and prices.</div>
+    <div class="grid" id="cards"></div>
+  </main>
+
+  <aside class="cart-panel" id="cartPanel">
+    <h3>Your cart</h3>
+    <div id="cartItems"></div>
+    <div class="cart-total"><strong>Total</strong><span id="cartTotal">0.00</span></div>
+    <a class="checkout" id="checkoutBtn" href="checkout.html">Checkout</a>
+  </aside>
+
+<section class="product-details">
+
+  <h2>Product Details</h2>
+
+  <div class="pd-block">
+  <h3>How to Top Up PUBG G-Coin on DaveTopUp?</h3>
+  <ol>
+    <li>
+      Enter the DaveTopUp.com official website:
+      <a href="https://www.davetopup.com" target="_blank" style="color:#007bff; font-weight:bold;">
+        https://davetopup.com
+      </a>. 
+      Select your preferred language and currency, then log in.
+    </li>
+    <li>2. On the Home page, click <strong>Gift Card > PUBG G-Coin.</strong>.</li>
+    <li>Determine how many<li> PUBG G-Coin </stronge>you want.</li>
+    <li>Click<strong>“Top-Up Now”</strong>.</li>
+  </ol>
+  <p>Choose your preferred payment method and click<li>‘Pay Now’</stronge>to finish payment.
+<li>Once your payment is processed, your <li>PUBG G-Coin </stronge>code will be sent to you instantly.</stronge>
+</p>
+</div>
+
+<div class="pd-block">
+  <h3>How to Redeem PUBG G-Coin?</h3>
+  <p>Log in to your PUBG account and head to the main lobby:</p>
+  <ol>
+    <li>Go to 'Store' and click on 'Add Bonus/Gift Code' Enter your redemption code and select 'Redeem' to claim your PUBG G-Coin.</li>
+</p>
+</div>
+  <!-- 🖼️ PHOTO INFO KOTE OU METE IMAGE LA -->
+  <div class="pd-image">
+    <img src="https://files.catbox.moe/ha5kjg.webp" alt="Gift Card Info">
+  </div>
+
+</section>
+
+<section class="extra-benefits">
+
+  <div class="benefit-item">
+    <i class="fas fa-shield-alt"></i>
+    <div class="benefit-text">
+      <h4>7-Day After-Sales Guarantee</h4>
+      <p>
+        An extended warranty period allows for post-sales support, including refunds, 
+        in case of in-game bans or other issues related to this order within 7 days after delivery.
+      </p>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <i class="fas fa-bolt"></i>
+    <div class="benefit-text">
+      <h4>Safe and Fast Top-Up</h4>
+      <p>
+        We use only formal channels for top-ups, ensuring traceable and reliable sources 
+        to guarantee your account security.
+      </p>
+    </div>
+  </div>
+
+  <div class="benefit-item">
+    <i class="fas fa-headset"></i>
+    <div class="benefit-text">
+      <h4>24/7 Customer Service</h4>
+      <p>
+        If you experience issues such as the top-up not being credited or an incorrect item purchased, 
+        you can reach out to our 24-hour customer service at any time, and we will assist you promptly.
+      </p>
+    </div>
+  </div>
+
+</section>
+
+<section class="product-extra">
+
+  <div class="pe-block">
+    <h3>What is a Turkey Apple iTunes Gift Card?</h3>
+    <p>
+      In Turkey, iTunes Gift Card and Apple Gift Card are fully merged and can be used interchangeably.
+      Redeem either an Apple digital gift card to instantly add balance to your Apple ID, which can be spent
+      across the entire Turkish Apple ecosystem—apps, music, games, films, and subscriptions.
+      This prepaid digital card is a simple and secure way to pay for Apple services without a credit card.
+    </p>
+  </div>
+
+  <div class="pe-block">
+    <h3>What is the Turkey Apple iTunes Gift Card used for?</h3>
+    <p>
+      A Turkey Apple / iTunes Gift Card allows you to add funds to your Apple ID balance in Turkish Lira (TRY).
+      You can use the balance to purchase apps, games, films, books, subscriptions (Apple Music, TV+, iCloud+),
+      and even physical products in Turkey.
+    </p>
+
+    <h4>Here's what you can do with the balance:</h4>
+    <ol>
+      <li><strong>Digital Content:</strong> Apps, games, in-app purchases, music, movies, TV shows, and e-books.</li>
+      <li><strong>Subscriptions:</strong> Apple Music, Apple TV+, Apple Arcade, and iCloud+ plans.</li>
+      <li><strong>Products & Accessories:</strong> Use balance to buy Apple hardware in Turkey (online or Apple Store app).</li>
+    </ol>
+  </div>
+
+  <div class="pe-block">
+    <h3>DaveTopUp: The Best Platform for Buying Apple iTunes Gift Cards</h3>
+    <p>Recharging your Apple iTunes Gift Card (TR) via DaveTopUp is hassle-free, secure, and cost-efficient.</p>
+
+    <ol>
+      <li><strong>Secure Transactions:</strong> DaveTopUp supports 40+ payment methods (PayPal, Visa, MasterCard) with advanced encryption and anti-fraud protection.</li>
+      <li><strong>Instant Delivery:</strong> Codes are delivered immediately after payment.</li>
+      <li><strong>24/7 Customer Support:</strong> Support team available any time for Apple iTunes Gift Card TR issues.</li>
+    </ol>
+  </div>
+
+  <div class="pe-block">
+    <h3>Looking for More Countries or Regions?</h3>
+    <p>
+      DaveTopUp offers Apple iTunes Gift Cards for many regions worldwide: Haiti, Türkiye, USA, Brazil, Mexico, and more.
+      Just visit the product page and select your country.
+    </p>
+  </div>
+
+  <div class="pe-block warning">
+    <h3>(Important!) Apple iTunes Gift Card Region Lock Notice</h3>
+    <p>
+      Apple Gift Cards are country-specific. A Turkey card will not work in Greece, Germany, or other regions.
+      Always check the correct region before redeeming.
+    </p>
+  </div>
+
+  <div class="pe-block danger">
+    <h3>Turkey Warning: Apple iTunes Gift Card Scam Risks</h3>
+    <p>
+      Beware of scams where individuals ask you to buy an iTunes card and send the code. LootBar is not responsible 
+      for third-party fraud as stated under Consumer Protection Law Art.15/2 and E-Commerce Law Art.9.
+      If anything seems suspicious, contact DaveTopUp support immediately.
+    </p>
+  </div>
+
+</section>
+
+<!-- WHY CHOOSE US SECTION -->
+<h2 class="section-title">Why Choose Us?</h2>
+
+<div class="why-card">
+  <!-- Feature 1 -->
+  <div class="feature">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 2l7 3v5c0 5-4 9-7 11-3-2-7-6-7-11V5l7-3z" stroke="#9ca3af" stroke-width="1.2" fill="#fff"/>
+        <path d="M9.2 11.2l1.6 1.6 3.6-3.6" stroke="#2b6cb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="content">
+      <h3>100% Secure Purchase</h3>
+      <p>
+  At <strong>Dave TopUp</strong>, We ensure efficient, professional, and secure transactions with full protection of your data—100% safe.</p>
+    </div>
+  </div>
+
+  <!-- Feature 2 -->
+  <div class="feature">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 13v-1a8 8 0 0116 0v1" stroke="#9ca3af" stroke-width="1.2"/>
+        <path d="M6 14v2a2 2 0 002 2h.5" stroke="#2b6cb0" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M18 14v2a2 2 0 01-2 2h-.5" stroke="#2b6cb0" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="12" cy="8.5" r="1.8" stroke="#2b6cb0" stroke-width="1.2" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="content">
+      <h3>Dedicated 24/7 Support</h3>
+      <p>
+  Our reliable customer service team is available anytime, offering fast and convenient assistance before, during, and after your purchase.</p>
+    </div>
+  </div>
+
+  <!-- Feature 3 -->
+  <div class="feature">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3.5" y="7" width="17" height="10" rx="2" stroke="#9ca3af" stroke-width="1.2" fill="#fff"/>
+        <path d="M8 12h8" stroke="#2b6cb0" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M12 9v6" stroke="#2b6cb0" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="content">
+      <h3>Full Refund Assurance</h3>
+      <p>
+  DaveTopUp offers most competitive prices and efficient delivery. If goods are undelivered or unusable, we promise a 100% refund and financial security.
+</p>
+    </div>
+  </div>
+</div>
+
+<!-- Continuous Carousel -->
+<div class="carousel-marquee">
+  <div class="carousel-track" id="carouselTrack">
+    <img src="https://files.catbox.moe/338zqd.png" alt="Image 1">
+    <img src="https://files.catbox.moe/osdoa1.png" alt="Image 2">
+    <img src="https://files.catbox.moe/err4fp.png" alt="Image 3">
+    <img src="https://files.catbox.moe/3hszgf.png" alt="Image 4">
+    <img src="https://files.catbox.moe/j2xznd.png" alt="Image 5">
+    <img src="https://files.catbox.moe/vmhv6k.png" alt="Image 6">
+    <img src="https://files.catbox.moe/1ht61n.png" alt="Image 7">
+    <img src="https://files.catbox.moe/hgpbf0.jpeg" alt="Image 8">
+    <img src="https://files.catbox.moe/fhc4c5.png" alt="Image 9">
+    <img src="https://files.catbox.moe/3udooy.png" alt="Image 10">
+    <img src="https://files.catbox.moe/z1huv2.png" alt="Image 11">
+    <img src="https://files.catbox.moe/90kx3s.png" alt="Image 12">
+    <img src="https://files.catbox.moe/j8z5qp.jpeg" alt="Image 13">
+    <img src="https://files.catbox.moe/1pexa5.jpeg" alt="Image 14">
+    <img src="https://files.catbox.moe/obmgyn.png" alt="Image 15">
+    <img src="https://files.catbox.moe/ebd1wn.png" alt="Image 16">
+    <img src="https://files.catbox.moe/pzz2aa.png" alt="Image 17">
+    <img src="https://files.catbox.moe/b5ljzm.png" alt="Image 18">
+    <img src="https://files.catbox.moe/xwvcnh.png" alt="Image 19">
+  </div>
+</div>
+
+<!-- Footer HTML -->
+<footer>
+  <div class="social-icons">
+    <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a>
+    <a href="https://wa.me/50942241547" target="_blank"><i class="fab fa-whatsapp"></i></a>
+  </div>
+  <p>© 2025 <strong>DAVE TECH</strong>. All rights reserved.</p>
+</footer>
+
+<script>
+/* --------------------- COUNTRY DATA --------------------- */
+const countryData = {
+  us: {
+    label: 'United States',
+    symbol: '$',
+    cards: [
+      {amount:2.97, img:'https://files.catbox.moe/s6ztf4.webp'},
+      {amount:3.96, img:'https://files.catbox.moe/mvssm4.webp'},
+      {amount:4.95, img:'https://files.catbox.moe/e6rost.webp'},
+      {amount:9.89, img:'https://files.catbox.moe/opfgmg.webp'},
+      {amount:14.84, img:'https://files.catbox.moe/omtsvt.webp'},
+      {amount:19.79, img:'https://files.catbox.moe/szg2yq.webp'},
+      {amount:24.74, img:'https://files.catbox.moe/utml35.webp'},
+      {amount:29.68, img:'https://files.catbox.moe/b0pirl.webp'},
+      {amount:34.63, img:'https://files.catbox.moe/2glvwa.webp'},
+      {amount:39.58, img:'https://files.catbox.moe/kmvk7v.webp'},
+      {amount:49.47, img:'https://files.catbox.moe/5q64y8.webp'},
+      {amount:59.37, img:'https://files.catbox.moe/d4boej.webp'},
+      {amount:69.26, img:'https://files.catbox.moe/l6plcx.webp'},
+      {amount:99.95, img:'https://files.catbox.moe/vclmqf.webp'}
+    ]
+  }
+};
+
+
+/* --------------------- DOM ELEMENTS --------------------- */
+const cardsContainer = document.getElementById('cards');
+
+const selectedText = document.getElementById("selectedCountryText");
+const openPicker = document.getElementById("openCountry");
+const modal = document.getElementById("countryModal");
+const closeModal = document.querySelector(".close");
+const countryList = document.getElementById("countryList");
+const search = document.querySelector(".search");
+
+const cartCount=document.getElementById('cartCount');
+const cartPanel=document.getElementById('cartPanel');
+const openCartBtn=document.getElementById('openCart');
+const cartItemsEl=document.getElementById('cartItems');
+const cartTotalEl=document.getElementById('cartTotal');
+
+let currentCountry = "us";
+let cart = [];
+
+
+/* --------------------- COUNTRY PICKER MODAL --------------------- */
+
+// open modal
+openPicker.onclick = () => modal.style.display = "block";
+
+// close modal
+closeModal.onclick = () => modal.style.display = "none";
+
+
+// Load countries inside modal
+function loadCountryList() {
+  countryList.innerHTML = "";
+
+  Object.entries(countryData).forEach(([code, info]) => {
+    countryList.innerHTML += `
+      <div class="country-item" data-code="${code}">
+        <img src="https://flagcdn.com/${code}.svg">
+        <span>${info.label}</span>
+      </div>
+    `;
+  });
+}
+loadCountryList();
+
+
+// search filter
+search.addEventListener("keyup", () => {
+  const term = search.value.toLowerCase();
+  document.querySelectorAll(".country-item").forEach(item => {
+    const name = item.textContent.toLowerCase();
+    item.style.display = name.includes(term) ? "flex" : "none";
+  });
+});
+
+
+// Select country
+document.addEventListener("click", (e) => {
+  const item = e.target.closest(".country-item");
+  if (!item) return;
+
+  const code = item.dataset.code;
+  currentCountry = code;
+
+  selectedText.innerText = countryData[code].label;
+  openPicker.querySelector("img.flag").src = `https://flagcdn.com/${code}.svg`;
+
+  modal.style.display = "none";
+  renderCards();
+});
+
+
+/* --------------------- RENDER CARDS --------------------- */
+function renderCards() {
+  const data = countryData[currentCountry];
+  cardsContainer.innerHTML = "";
+
+  data.cards.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML=`
+  <div class="art"><img src="${c.img}" alt="Card"></div>
+  <div class="price" style="color:red">${data.symbol}${c.amount}</div>
+  <div class="old-price">\$${(c.amount * 1.35).toFixed(2)}</div>
+  <div class="promo">-\$${(Math.abs(c.amount - (c.amount * 1.35))).toFixed(2)}</div>
+  <div class="meta">iTunes Gift Card - ${data.label} - ${c.amount} USD</div>
+  <div class="actions">
+    <button class="add" data-amt="${c.amount}">Add to cart</button>
+  </div>`;
+    cardsContainer.appendChild(el);
+  });
+
+  document.querySelectorAll('.add').forEach(btn => btn.addEventListener('click', () => {
+    addToCart({
+      country: countryData[currentCountry].label,
+      symbol: countryData[currentCountry].symbol,
+      amount: Number(btn.getAttribute("data-amt"))
+    });
+  }));
+}
+
+renderCards();
+
+
+/* --------------------- CART SYSTEM --------------------- */
+function addToCart(item){
+  cart.push(item);
+  updateCartUI();
+  cartPanel.style.display='block';
+}
+
+function updateCartUI(){
+  cartCount.textContent = cart.length;
+  cartItemsEl.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach(it => {
+    total += it.amount;
+
+    const row = document.createElement("div");
+    row.className = "cart-item";
+
+    row.innerHTML = `
+      <img src="https://via.placeholder.com/56x46/cccccc/000?text=${it.symbol}${it.amount}">
+      <div style="flex:1">${it.country}</div>
+      <div>${it.symbol}${it.amount}</div>
+    `;
+
+    cartItemsEl.appendChild(row);
+  });
+
+  cartTotalEl.textContent = (cart[0]?.symbol || "$") + total.toFixed(2);
+}
+
+openCartBtn.onclick = () => {
+  cartPanel.style.display = cartPanel.style.display === "block" ? "none" : "block";
+};
+
+</script>
+</body>
+</html>

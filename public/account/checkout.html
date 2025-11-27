@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAWENS SHOP | Checkout</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body, h1,h2,h3,h4,p,ul,li,a,button,input,select,textarea { margin:0; padding:0; font-family:'Poppins', Arial, sans-serif; }
+a { text-decoration:none; color:inherit; }
+
+body { background:#f9f9f9; }
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 20px;
+  background: linear-gradient(90deg,#ff8a00,#ff2079);
+  color:#fff;
+  position:fixed; top:0; width:100%; z-index:100;
+}
+header .logo img { height:50px; }
+.back-btn { font-size:24px; background:none; border:none; cursor:pointer; color:#fff; }
+
+main { max-width:900px; margin:100px auto 50px; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
+
+h2 { color:#ff2079; margin-bottom:20px; text-align:center; }
+form { display:grid; gap:15px; }
+label { font-weight:600; margin-bottom:5px; display:block; }
+input, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
+
+.product-detail { display:flex; gap:15px; margin:20px 0; align-items:center; border:1px solid #ddd; padding:10px; border-radius:8px; background:#fafafa; }
+.product-detail img { width:120px; height:120px; border-radius:8px; object-fit:cover; }
+.product-info h4 { margin-bottom:6px; color:#333; }
+.product-info p { color:#555; margin-bottom:4px; }
+.product-info .price { font-weight:700; color:#ff2079; }
+
+.btn-pay {
+  display:inline-block; padding:15px 25px; background:#ff2079; color:#fff;
+  border:none; border-radius:8px; font-weight:700; font-size:16px;
+  cursor:not-allowed; transition:0.3s; margin-top:20px; text-align:center; opacity:0.6;
+}
+.btn-pay.active { cursor:pointer; opacity:1; }
+.btn-pay:hover.active { background:#ff8a00; }
+
+footer { text-align:center; padding:20px; color:#777; background:#f9f9f9; border-top:1px solid #ddd; margin-top:50px; }
+.footer-owner img { width:40px; height:40px; border-radius:50%; object-fit:cover; }
+.footer-owner { display:flex; justify-content:center; align-items:center; gap:15px; flex-wrap:wrap; }
+.footer-owner a { color:#ff2079; font-weight:600; }
+
+@media(max-width:600px) {
+  .product-detail { flex-direction:column; text-align:center; }
+  .product-detail img { width:100%; height:auto; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <a href="page1.html"><img src="https://files.catbox.moe/gt8dvw.png"></a>
+  </div>
+  <button class="back-btn" onclick="window.history.back();"><i class="fa-solid fa-arrow-left"></i></button>
+</header>
+
+<main>
+<h2>Checkout</h2>
+
+<form id="checkoutForm">
+  <div>
+    <label>Name</label>
+    <input type="text" id="name" required>
+  </div>
+
+  <div>
+    <label>Email</label>
+    <input type="email" id="email" required>
+  </div>
+
+  <div>
+    <label>Number</label>
+    <input type="tel" id="number" placeholder="+509 1234 5678" required>
+  </div>
+
+  <div>
+    <label>Country</label>
+    <input list="countries" id="country" required placeholder="Start typing...">
+    <datalist id="countries">
+      <option value="Haiti">
+      <option value="United States">
+      <option value="Canada">
+      <option value="France">
+      <option value="Germany">
+      <option value="United Kingdom">
+      <option value="Brazil">
+      <option value="Mexico">
+      <option value="Dominican Republic">
+      <option value="Jamaica">
+      <option value="India">
+      <option value="Australia">
+      <option value="Japan">
+      <option value="China">
+      <option value="Spain">
+      <option value="Italy">
+      <option value="Argentina">
+      <option value="Chile">
+      <option value="Colombia">
+      <option value="Netherlands">
+    </datalist>
+  </div>
+
+  <div>
+    <label>Street address*</label>
+    <input list="addrList" id="address1" required placeholder="Start typing address...">
+    <datalist id="addrList"></datalist>
+  </div>
+
+  <div>
+    <label>Apartment, unit, suite, or floor #</label>
+    <input type="text" id="address2" required placeholder="Apartment / Suite">
+  </div>
+
+  <div>
+    <label>City*</label>
+    <input type="text" id="city" required>
+  </div>
+
+  <div>
+    <label>State/Province*</label>
+    <input type="text" id="state" required>
+  </div>
+
+  <div>
+    <label>Postal code*</label>
+    <input type="text" id="zip" required>
+  </div>
+</form>
+
+<div class="product-detail" id="productDetail"></div>
+
+<a id="payBtn" href="#" class="btn-pay" target="_blank">Go to Pay</a>
+
+</main>
+
+<footer>
+  <div class="footer-owner">
+    <img src="https://files.catbox.moe/gt8dvw.png">
+    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+    <a href="#"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <span><b style="color:#ff2079;">DAWENS SHOP</b></span>
+  </div>
+  <p>© 2025 DAWENS SHOP — Tous droits réservés.</p>
+</footer>
+
+<script>
+// ---------------- ADDRESS AUTOCOMPLETE (OFFLINE) ----------------
+const fakeAddresses = [
+  {addr:"Delmas 33", city:"Port-au-Prince", state:"Ouest", zip:"6110"},
+  {addr:"Petion-Ville Route 9", city:"Petion-Ville", state:"Ouest", zip:"6140"},
+  {addr:"Tabarre 52", city:"Tabarre", state:"Ouest", zip:"6120"},
+  {addr:"Carrefour Feuilles", city:"Carrefour", state:"Ouest", zip:"6130"},
+
+  {addr:"1600 Pennsylvania Ave", city:"Washington", state:"DC", zip:"20500"},
+  {addr:"350 5th Avenue", city:"New York", state:"NY", zip:"10118"},
+  {addr:"1 Apple Park Way", city:"Cupertino", state:"CA", zip:"95014"},
+  {addr:"500 S Buena Vista St", city:"Burbank", state:"CA", zip:"91521"},
+
+  {addr:"Rue de Rivoli", city:"Paris", state:"Île-de-France", zip:"75001"},
+  {addr:"Champs-Élysées", city:"Paris", state:"Île-de-France", zip:"75008"},
+
+  {addr:"Yonge Street", city:"Toronto", state:"Ontario", zip:"M4Y1W7"},
+  {addr:"Rue Sainte-Catherine", city:"Montreal", state:"Quebec", zip:"H2X1K2"},
+
+  {addr:"Oxford Street", city:"London", state:"England", zip:"W1D1BS"},
+  {addr:"Baker Street", city:"London", state:"England", zip:"NW16XE"},
+
+  {addr:"Av Paulista", city:"São Paulo", state:"SP", zip:"01311-200"},
+  {addr:"Copacabana", city:"Rio de Janeiro", state:"RJ", zip:"22070-011"}
+];
+
+// Show suggestions
+document.getElementById("address1").addEventListener("input", function() {
+    const val = this.value.toLowerCase();
+    const list = document.getElementById("addrList");
+    list.innerHTML = "";
+
+    fakeAddresses
+      .filter(a => a.addr.toLowerCase().includes(val))
+      .forEach(a => {
+          const op = document.createElement("option");
+          op.value = a.addr;
+          list.appendChild(op);
+      });
+});
+
+// Autofill city/state/zip
+document.getElementById("address1").addEventListener("change", function() {
+    const select = fakeAddresses.find(a => a.addr === this.value);
+    if(select) {
+        document.getElementById("city").value = select.city;
+        document.getElementById("state").value = select.state;
+        document.getElementById("zip").value = select.zip;
+        checkForm();
+    }
+});
+
+// ---------------- LOAD PRODUCT ----------------
+window.addEventListener("DOMContentLoaded", () => {
+    const product = JSON.parse(localStorage.getItem("selectedProduct"));
+    if(product) {
+        const container = document.getElementById("productDetail");
+        container.innerHTML = `
+            <img src="${product.img}">
+            <div class="product-info">
+                <h4>${product.title}</h4>
+                <p>Level: ${product.level}</p>
+                <p>Skins: ${product.skins}</p>
+                <p>VIP: ${product.vip}</p>
+                <p class="price">${product.price}</p>
+            </div>
+        `;
+    }
+});
+
+// ---------------- VALIDATION ----------------
+const fields = ["name","email","number","country","address1","address2","city","state","zip"];
+const payBtn = document.getElementById("payBtn");
+
+function checkForm() {
+    const ok = fields.every(id => document.getElementById(id).value.trim() !== "");
+    if(ok) {
+        payBtn.classList.add("active");
+        payBtn.href = "https://914e4594-d234-45b9-8574-5194ab939b42.paylinks.godaddy.com/kontshopdawens";
+    } else {
+        payBtn.classList.remove("active");
+        payBtn.href = "#";
+    }
+}
+
+fields.forEach(id => {
+    document.getElementById(id).addEventListener("input", checkForm);
+});
+</script>
+
+</body>
+</html>
