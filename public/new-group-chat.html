@@ -643,26 +643,95 @@ function timeNow() {
   return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
 }
 
-// --- SEND MESSAGE FUNCTION ---
-function sendMessage(content) {
-  if (!content) return;
-  const msg = document.createElement('div');
-  msg.className = 'msg-row msg-right';
-  msg.innerHTML = `
-    <img class="avatar" src="https://i.pravatar.cc/36?img=5" alt="you">
-    <div class="bubble-container">
-      <div class="bubble right">${content}</div>
-      <div class="msg-meta"><span>${timeNow()}</span><span><i class="fas fa-check"></i></span></div>
-    </div>
-  `;
-  messages.appendChild(msg);
-  messages.scrollTop = messages.scrollHeight;
+// --- API base resolver and message loading ---
+const API_BASE = (window.__API_BASE__ || '').trim() || (window.location.hostname === 'localhost' ? (window.location.origin.replace(/:\d+$/, ':8000') + '/api') : (window.location.origin + '/api'));
+
+// Load messages from backend and render them (clears static content)
+async function loadMessages(){
+  try{
+    const res = await fetch((API_BASE || '/api') + '/chat/messages');
+    if(!res.ok) return;
+    const data = await res.json();
+    // Clear existing messages (including static examples)
+    const container = document.getElementById('messages');
+    container.innerHTML = '';
+
+    // Show only last N messages and filter old messages (TTL = 30 days)
+    const TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+    const now = Date.now();
+    const msgs = (data.messages || []).slice(0, 200).reverse();
+    msgs.forEach(m => {
+      // created_at expected from backend
+      const created = m.created_at ? new Date(m.created_at).getTime() : now;
+      if(now - created > TTL_MS) return; // skip old messages
+
+      const isUser = !!m.user_id || !!m.author_name;
+      const row = document.createElement('div');
+      row.className = 'msg-row ' + (isUser ? 'msg-right' : 'msg-left');
+      const avatar = isUser ? 'https://i.pravatar.cc/36?img=5' : 'https://i.pravatar.cc/36?img=10';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble ' + (isUser ? 'right' : 'left');
+      bubble.innerHTML = (m.author_name ? '<div class="name-label">'+escapeHtml(m.author_name)+'</div>' : '') + escapeHtml(m.body || '');
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      const timeEl = document.createElement('div');
+      timeEl.className = 'msg-time';
+      timeEl.textContent = new Date(m.created_at).toLocaleString();
+      meta.appendChild(timeEl);
+
+      const avatarEl = document.createElement('img');
+      avatarEl.className = 'avatar';
+      avatarEl.src = avatar;
+
+      const wrapper = document.createElement('div');
+      wrapper.appendChild(bubble);
+      wrapper.appendChild(meta);
+
+      row.appendChild(avatarEl);
+      row.appendChild(wrapper);
+      container.appendChild(row);
+    });
+    container.scrollTop = container.scrollHeight;
+  }catch(e){
+    console.warn('Failed to load messages', e);
+  }
+}
+
+// Initial load and periodic refresh
+loadMessages();
+setInterval(loadMessages, 5000);
+
+// --- SEND MESSAGE FUNCTION (posts to backend) ---
+async function sendMessage(content){
+  if(!content) return;
+  try{
+    const res = await fetch((API_BASE || '/api') + '/chat/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ body: content, author_name: currentUser ? currentUser.name : null })
+    });
+    if(!res.ok){
+      console.error('Failed to post message', res.status);
+      return;
+    }
+    // reload latest messages from server (prevents duplicates and removes static examples)
+    await loadMessages();
+  }catch(e){
+    console.error('sendMessage error', e);
+  }
 }
 
 // --- SEND BUTTON CLICK ---
-sendBtn.addEventListener('click', () => {
-  sendMessage(escapeHtml(msgInput.value.trim()));
+sendBtn.addEventListener('click', async () => {
+  const content = escapeHtml(msgInput.value.trim());
+  if(!content) return;
+  // disable send while posting
+  sendBtn.classList.add('disabled');
+  sendBtn.style.opacity = '0.6';
+  await sendMessage(content);
   msgInput.value = '';
+  sendBtn.classList.remove('disabled');
+  sendBtn.style.opacity = '1';
 });
 
 // --- EMOJI / STICKER / GIFT PICKER ---

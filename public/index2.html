@@ -273,6 +273,9 @@ transition: transform 0.3s;
  <!-- Top Navigation Buttons -->
 <div class="top-buttons">
   <button class="nav-btn" data-page="index3.html"><i class="fa-solid fa-store"></i> Shop</button>
+  <button class="nav-btn" data-page="Shop/boys.html"><i class="fa-solid fa-person"></i> Boys</button>
+  <button class="nav-btn" data-page="Shop/womens.html"><i class="fa-solid fa-person-dress"></i> Womens</button>
+  <button class="nav-btn" data-page="Shop/kids.html"><i class="fa-solid fa-child"></i> Kids</button>
   <button class="nav-btn" data-page="feature/service.html"><i class="fa-solid fa-hand-holding-heart"></i> Services</button>
   <button class="nav-btn" data-page="movie.html"><i class="fa-solid fa-bolt"></i> Movie</button>
   <button class="nav-btn" data-page="feature/offers.html"><i class="fa-solid fa-tags"></i> Offers</button>
@@ -287,13 +290,13 @@ transition: transform 0.3s;
   <h2>Bienvenue sur Sky TopUp - Films</h2>
   <p>Choisissez vos applications de streaming préférées pour visionner facilement.</p>
 
-  <div class="grid">
-    <div class="card"><img src="https://files.catbox.moe/luzeoi.jpeg" alt="Netflix"><p>Films & Séries</p><h3>Netflix</h3><a href="Films/1.html" class="btn">CHOIX DES OPTIONS</a></div>
-    <div class="card"><img src="https://files.catbox.moe/jlidym.jpeg" alt="Disney+"><p>Films & Séries</p><h3>Disney+</h3><a href="Films/2.html" class="btn">CHOIX DES OPTIONS</a></div>
-    <div class="card"><img src="https://files.catbox.moe/cedwal.jpeg" alt="Amazon Prime"><p>Films & Séries</p><h3>Amazon Prime</h3><a href="Films/3.html" class="btn">CHOIX DES OPTIONS</a></div>
-    <div class="card"><img src="https://files.catbox.moe/qk7ajp.jpeg" alt="Hulu"><p>Films & Séries</p><h3>Hulu</h3><a href="Films/4.html" class="btn">CHOIX DES OPTIONS</a></div>
-    <div class="card"><img src="https://files.catbox.moe/1jcgvn.jpeg" alt="HBO Max"><p>Films & Séries</p><h3>HBO Max</h3><a href="Films/6.html" class="btn">CHOIX DES OPTIONS</a></div>
-    <div class="card"><img src="https://files.catbox.moe/q71bid.jpeg" alt="Apple TV"><p>Films & Séries</p><h3>Apple TV+</h3><a href="Films/5.html" class="btn">CHOIX DES OPTIONS</a></div>
+  <div class="grid" id="productGrid">
+    <div class="card" data-product="netflix" data-price="14.99"><img src="https://files.catbox.moe/luzeoi.jpeg" alt="Netflix"><p>Films & Séries</p><h3>Netflix</h3><button class="btn checkout-btn" onclick="initiateCheckout(event, 'netflix', 'Netflix', 14.99)">ACHETER</button></div>
+    <div class="card" data-product="disney" data-price="10.99"><img src="https://files.catbox.moe/jlidym.jpeg" alt="Disney+"><p>Films & Séries</p><h3>Disney+</h3><button class="btn checkout-btn" onclick="initiateCheckout(event, 'disney', 'Disney+', 10.99)">ACHETER</button></div>
+    <div class="card" data-product="amazon" data-price="12.99"><img src="https://files.catbox.moe/cedwal.jpeg" alt="Amazon Prime"><p>Films & Séries</p><h3>Amazon Prime</h3><button class="btn checkout-btn" onclick="initiateCheckout(event, 'amazon', 'Amazon Prime', 12.99)">ACHETER</button></div>
+    <div class="card" data-product="hulu" data-price="7.99"><img src="https://files.catbox.moe/qk7ajp.jpeg" alt="Hulu"><p>Films & Séries</p><h3>Hulu</h3><button class="btn checkout-btn" onclick="initiateCheckout(event, 'hulu', 'Hulu', 7.99)">ACHETER</button></div>
+    <div class="card" data-product="hbo" data-price="15.99"><img src="https://files.catbox.moe/1jcgvn.jpeg" alt="HBO Max"><p>Films & Séries</p><h3>HBO Max</h3><button class="btn checkout-btn" onclick="initiateCheckout(event, 'hbo', 'HBO Max', 15.99)">ACHETER</button></div>
+    <div class="card" data-product="appletv" data-price="9.99"><img src="https://files.catbox.moe/q71bid.jpeg" alt="Apple TV"><p>Films & Séries</p><h3>Apple TV+</h3><button class="btn checkout-btn" onclick="initiateCheckout(event, 'appletv', 'Apple TV+', 9.99)">ACHETER</button></div>
   </div>
 
   <div class="pager" id="pager">
@@ -434,6 +437,164 @@ document.querySelectorAll('.page-btn').forEach(btn => {
     if (page) window.location.href = page;
   });
 });
+
+// ===== CHECKOUT API INTEGRATION =====
+const API_BASE_URL = window.location.origin + '/api';
+const CHECKOUT_ENDPOINT = API_BASE_URL + '/checkout';
+
+// Resolve API base URL (Vite env or fallback)
+function getApiBase() {
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (window.VITE_API_URL) return window.VITE_API_URL;
+  if (window.REACT_APP_API_BASE) return window.REACT_APP_API_BASE;
+  return window.location.origin + '/api';
+}
+
+const apiBase = getApiBase();
+
+// Initiate checkout for a product
+function initiateCheckout(event, productId, productName, price) {
+  event.preventDefault();
+  
+  // Create checkout modal
+  const modal = document.createElement('div');
+  modal.id = 'checkoutModal';
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); display: flex; justify-content: center;
+    align-items: center; z-index: 1000;
+  `;
+  
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white; padding: 30px; border-radius: 12px;
+    width: 90%; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  `;
+  
+  content.innerHTML = `
+    <h2 style="margin-top: 0;">Checkout - ${productName}</h2>
+    <p style="color: #666; font-size: 14px;">Price: <strong>$${price.toFixed(2)}</strong></p>
+    
+    <form id="quickCheckoutForm" style="margin: 20px 0;">
+      <div style="margin-bottom: 15px;">
+        <label for="userEmail" style="display: block; margin-bottom: 5px; font-weight: 600;">Email</label>
+        <input type="email" id="userEmail" name="email" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label for="userName" style="display: block; margin-bottom: 5px; font-weight: 600;">Full Name</label>
+        <input type="text" id="userName" name="name" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label for="userCountry" style="display: block; margin-bottom: 5px; font-weight: 600;">Country</label>
+        <input type="text" id="userCountry" name="country" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label for="paymentMethod" style="display: block; margin-bottom: 5px; font-weight: 600;">Payment Method</label>
+        <select id="paymentMethod" name="paymentMethod" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+          <option value="">Select payment method</option>
+          <option value="stripe">Credit Card (Stripe)</option>
+          <option value="paypal">PayPal</option>
+          <option value="crypto">Cryptocurrency</option>
+        </select>
+      </div>
+      
+      <div id="checkoutError" style="color: #d32f2f; margin-bottom: 15px; display: none;"></div>
+      
+      <div style="display: flex; gap: 10px;">
+        <button type="button" id="cancelCheckout" style="flex: 1; padding: 10px; background: #ccc; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+        <button type="button" id="proceedCheckout" onclick="proceedCheckout(event, '${productId}', '${productName}', ${price})" style="flex: 1; padding: 10px; background: #2f855a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Proceed</button>
+      </div>
+    </form>
+  `;
+  
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+  
+  // Close modal handlers
+  document.getElementById('cancelCheckout').addEventListener('click', () => {
+    modal.remove();
+  });
+  
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
+// Proceed with checkout
+async function proceedCheckout(event, productId, productName, price) {
+  event.preventDefault();
+  
+  const form = document.getElementById('quickCheckoutForm');
+  const errorDiv = document.getElementById('checkoutError');
+  const proceedBtn = event.target;
+  
+  // Validate form
+  if (!form.checkValidity()) {
+    errorDiv.textContent = 'Please fill in all required fields.';
+    errorDiv.style.display = 'block';
+    return;
+  }
+  
+  const formData = new FormData(form);
+  const checkoutData = {
+    email: formData.get('email'),
+    name: formData.get('name'),
+    country: formData.get('country'),
+    paymentMethod: formData.get('paymentMethod'),
+    productId: productId,
+    productName: productName,
+    amount: price,
+    currency: 'USD',
+  };
+  
+  proceedBtn.disabled = true;
+  proceedBtn.textContent = 'Processing...';
+  errorDiv.style.display = 'none';
+  
+  try {
+    // Call checkout API
+    const response = await fetch(apiBase + '/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(checkoutData),
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Payment successful
+      alert('Payment successful! Order ID: ' + result.orderId);
+      
+      // Close modal and show success
+      const modal = document.getElementById('checkoutModal');
+      if (modal) modal.remove();
+      
+      // Redirect to order details or success page after 2s
+      setTimeout(() => {
+        window.location.href = 'success.html?orderId=' + result.orderId;
+      }, 2000);
+    } else {
+      errorDiv.textContent = result.message || 'Checkout failed. Please try again.';
+      errorDiv.style.display = 'block';
+      proceedBtn.disabled = false;
+      proceedBtn.textContent = 'Proceed';
+    }
+  } catch (error) {
+    console.error('Checkout error:', error);
+    errorDiv.textContent = 'Network error. Please check your connection and try again.';
+    errorDiv.style.display = 'block';
+    proceedBtn.disabled = false;
+    proceedBtn.textContent = 'Proceed';
+  }
+}
+
 </script>
 </body>
 </html>

@@ -223,7 +223,7 @@ document.getElementById('menu-btn').onclick=()=>{
 };
 
 // Add message
-function addMessage(text,sender='user',photo){
+function addMessage(text,sender='user',photo, createdAt){
   const msg=document.createElement('div');
   msg.classList.add('message',sender);
   const img=document.createElement('img');
@@ -231,13 +231,47 @@ function addMessage(text,sender='user',photo){
   const content=document.createElement('div');
   content.classList.add('message-content');
   content.innerHTML=text;
+  const meta = document.createElement('div');
+  meta.style.fontSize='11px';
+  meta.style.color='#9ca3af';
+  meta.style.marginTop='6px';
+  if(createdAt){
+    try{
+      const d = new Date(createdAt);
+      meta.textContent = d.toLocaleString();
+    }catch(e){
+      meta.textContent = createdAt;
+    }
+    content.appendChild(meta);
+  }
   msg.appendChild(img);
   msg.appendChild(content);
   messages.appendChild(msg);
   messages.scrollTop=messages.scrollHeight;
 }
 
-// Gemini/OpenAI fallback
+// API base resolver: prefer VITE_API_URL / VITE_API_BASE, fallback to /api on localhost
+const API_BASE = (window.__API_BASE__ || '').trim() || (typeof VITE_API_URL !== 'undefined' ? VITE_API_URL : '') || (window.location.hostname === 'localhost' ? (window.location.origin.replace(/:\d+$/, ':8000') + '/api') : (window.location.origin + '/api'));
+
+// Use backend to store and load chat messages. This avoids exposing API keys in the client.
+async function loadMessages(){
+  try{
+    const res = await fetch((API_BASE || '/api') + '/chat/messages');
+    if(!res.ok) return;
+    const data = await res.json();
+    // Clear existing messages
+    messages.innerHTML = '';
+    (data.messages || []).reverse().forEach(m => {
+      const sender = m.user_id ? 'user' : (m.author_name ? 'user' : 'bot');
+      const photo = sender === 'user' ? userPhoto : botPhoto;
+      const content = m.body || '';
+      addMessage(content, sender, photo, m.created_at || m.updated_at);
+    });
+  }catch(e){
+    console.warn('Failed to load messages', e);
+  }
+}
+
 async function sendMessage(prompt){
   if(messageCount>=50){
     const now=Date.now();
@@ -248,59 +282,40 @@ async function sendMessage(prompt){
   }
   messageCount++;
   localStorage.setItem('lastTime',Date.now());
-  const lang=document.getElementById('lang').value;
-  addMessage('<i>Le bot réfléchit...</i>','bot',botPhoto);
+  const sendBtn = document.getElementById('send-btn');
+  const prevHtml = sendBtn.innerHTML;
+  try{
+    // show loading
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
 
-  // Eseye Gemini si gen kle
-  const GEMINI_API_KEY = "YOUR_GEMINI_KEY"; // mete kle w si ou genyen
-
-  try {
-    if(GEMINI_API_KEY && GEMINI_API_KEY!=="AIzaSyB7URXCSpZtdCdKCjBGkvV27nLURDDn1FM"){
-      const res = await fetch("https://api.gemini.com/v1/complete",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "Authorization":`Bearer ${GEMINI_API_KEY}`
-        },
-        body:JSON.stringify({prompt,max_tokens:150})
-      });
-      const data = await res.json();
-      const reply = data.reply || data.text || "Erreur.";
-      addMessage(reply,'bot',botPhoto);
-      speakReply(reply,lang);
+    // Call server-side AI responder which will persist both user and bot messages
+    const res = await fetch((API_BASE || '/api') + '/chat/respond',{ 
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ body: prompt })
+    });
+    if(!res.ok){
+      const body = await res.json().catch(()=>({}));
+      addMessage('❌ Erè: pa kapab jwenn repons (AI).','bot',botPhoto);
+      console.error('AI respond failed', res.status, body);
       return;
     }
-  } catch(e){
-    console.warn("Gemini API failed, fallback to OpenAI:",e);
-  }
-
-  // Fallback OpenAI
-  const OPENAI_API_KEY = "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"; // mete kle w isit
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":`Bearer ${OPENAI_API_KEY}`
-      },
-      body:JSON.stringify({
-        model:"gpt-4",
-        messages:[
-          {role:"system",content:"Ou se yon AI assistant pou shop bot"},
-          {role:"user",content:prompt}
-        ],
-        max_tokens:200
-      })
-    });
-    const data = await res.json();
-    const reply = data.choices && data.choices[0].message.content
-      ? data.choices[0].message.content
-      : "🤖 Je n'ai pas de réponse pour le moment";
-    addMessage(reply,'bot',botPhoto);
-    speakReply(reply,lang);
-  } catch(e){
-    console.error("OpenAI API error:",e);
-    addMessage("❌ Erreur lors de l'appel OpenAI.",'bot',botPhoto);
+    const json = await res.json();
+    // Reload messages to include latest user + bot reply
+    await loadMessages();
+    // Speak reply if available
+    if(json.reply){
+      const lang=document.getElementById('lang').value;
+      speakReply(json.reply, lang);
+    }
+  }catch(e){
+    console.error('sendMessage error', e);
+    addMessage('❌ Erè rezo pandan voye mesaj la.', 'bot', botPhoto);
+  } finally {
+    // restore send button
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = prevHtml;
   }
 }
 
@@ -339,6 +354,13 @@ document.getElementById('mic-btn').onclick=()=>{
   if(recognition) recognition.start();
 };
 
+// Upload button opens file picker
+const uploadBtn = document.getElementById('upload-btn');
+const uploadPhoto = document.getElementById('upload-photo');
+if(uploadBtn && uploadPhoto){
+  uploadBtn.addEventListener('click', () => uploadPhoto.click());
+}
+
 // Upload photo
 document.getElementById('upload-photo').onchange = async e => {
   const file = e.target.files[0];
@@ -370,7 +392,14 @@ window.addEventListener('load',()=>{
   const browserLang=navigator.language.slice(0,2);
   const langSelect=document.getElementById('lang');
   if([...langSelect.options].some(opt=>opt.value===browserLang)) langSelect.value=browserLang;
-  addMessage("👋 Bienvenue sur <b>Dawens Chatbot Pro+</b> — comment puis-je vous aider aujourd’hui ?",'bot',botPhoto);
+  // Load existing messages from backend; show welcome only if none
+  loadMessages().then(() => {
+    if(!messages.hasChildNodes()){
+      addMessage("👋 Bienvenue sur <b>Dawens Chatbot Pro+</b> — comment puis-je vous aider aujourd’hui ?",'bot',botPhoto);
+    }
+  }).catch(()=>{
+    addMessage("👋 Bienvenue sur <b>Dawens Chatbot Pro+</b> — comment puis-je vous aider aujourd’hui ?",'bot',botPhoto);
+  });
 });
 </script>
 </body>
