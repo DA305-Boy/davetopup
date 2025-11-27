@@ -1,0 +1,515 @@
+{
+  "info": {
+    "name": "DaveTopUp Checkout API",
+    "description": "Production checkout system for game top-up with multiple payment methods",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"id\": \"ff-diamonds-100\",\n      \"name\": \"100 Diamonds\",\n      \"game\": \"Free Fire\",\n      \"price\": 9.99,\n      \"quantity\": 1\n    }\n  ],\n  \"email\": \"player@example.com\",\n  \"playerUid\": \"123456789\",\n  \"playerNickname\": \"PlayerName\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Create a new order. Returns order ID and total amount with tax."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/ORD-abc123-1700000000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "ORD-abc123-1700000000"]
+            },
+            "description": "Retrieve full order details including items and transactions."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/ORD-abc123-1700000000/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "ORD-abc123-1700000000", "status"]
+            },
+            "description": "Quick status check for an order. Returns only status without full details."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments - Card",
+      "item": [
+        {
+          "name": "Process Card Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-abc123-1700000000\",\n  \"stripeToken\": \"tok_visa\",\n  \"amount\": 10.79,\n  \"currency\": \"usd\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/card",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "card"]
+            },
+            "description": "Process Stripe card payment. Handles 3D Secure if required.\n\nTest Cards:\n- Success: 4242 4242 4242 4242\n- 3D Secure: 4000 0025 0000 3155\n- Decline: 4000 0000 0000 0002"
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm 3D Secure Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientSecret\": \"pi_1Iv5mkBs6QVGD3xt_secret_xxx\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/card/confirm-3d",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "card", "confirm-3d"]
+            },
+            "description": "Confirm 3D Secure authentication after user completes challenge."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments - PayPal",
+      "item": [
+        {
+          "name": "Initiate PayPal Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-abc123-1700000000\",\n  \"amount\": 10.79,\n  \"currency\": \"USD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/paypal",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "paypal"]
+            },
+            "description": "Create PayPal order and return approval URL. Redirect user to approval_url."
+          },
+          "response": []
+        },
+        {
+          "name": "Capture PayPal Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paypalOrderId\": \"7Y36...EYU\",\n  \"orderId\": \"ORD-abc123-1700000000\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/paypal/capture",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "paypal", "capture"]
+            },
+            "description": "Capture PayPal payment after user approves. Called via callback URL."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments - Binance",
+      "item": [
+        {
+          "name": "Initiate Binance Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-abc123-1700000000\",\n  \"amount\": 10.79\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/binance",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "binance"]
+            },
+            "description": "Create Binance Pay order and return checkout URL. Redirect user to checkout_url."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments - Voucher",
+      "item": [
+        {
+          "name": "Redeem Voucher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-abc123-1700000000\",\n  \"voucherCode\": \"GIFT-CARD-TEST\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/voucher",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "voucher"]
+            },
+            "description": "Redeem a voucher or gift card. Automatically approves if valid or marks as pending verification."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Stripe Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Stripe-Signature",
+                "value": "t=timestamp,v1=signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_1Iv5mkBs6QVGD3xt\",\n  \"object\": \"event\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_1Iv5mkBs6QVGD3xt\",\n      \"status\": \"succeeded\",\n      \"amount\": 1079\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/stripe",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "stripe"]
+            },
+            "description": "Webhook endpoint for Stripe payment events. Verifies signature automatically."
+          },
+          "response": []
+        },
+        {
+          "name": "PayPal Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "PayPal-Transmission-Id",
+                "value": "transmission_id"
+              },
+              {
+                "key": "PayPal-Transmission-Time",
+                "value": "2024-01-01T00:00:00Z"
+              },
+              {
+                "key": "PayPal-Cert-Url",
+                "value": "https://api.sandbox.paypal.com/cert"
+              },
+              {
+                "key": "PayPal-Auth-Algo",
+                "value": "SHA256withRSA"
+              },
+              {
+                "key": "PayPal-Transmission-Sig",
+                "value": "signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"WH-7Y36...\",\n  \"event_type\": \"CHECKOUT.ORDER.COMPLETED\",\n  \"resource\": {\n    \"id\": \"7Y36...\",\n    \"status\": \"COMPLETED\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/paypal",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "paypal"]
+            },
+            "description": "Webhook endpoint for PayPal events. Verifies signature automatically."
+          },
+          "response": []
+        },
+        {
+          "name": "Binance Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "BinancePay-Timestamp",
+                "value": "1700000000000"
+              },
+              {
+                "key": "BinancePay-Nonce",
+                "value": "nonce"
+              },
+              {
+                "key": "BinancePay-Signature",
+                "value": "signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantTradeNo\": \"ORD-abc123-1700000000\",\n  \"prepayId\": \"240000000001234567\",\n  \"status\": \"PAID\",\n  \"totalFeeInUsd\": \"10.79\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/webhooks/binance",
+              "host": ["{{base_url}}"],
+              "path": ["api", "webhooks", "binance"]
+            },
+            "description": "Webhook endpoint for Binance Pay events. Verifies signature automatically."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/orders?status=pending&page=1&per_page=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "orders"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "List all orders with filtering. Requires admin authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Process Refund",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-abc123-1700000000\",\n  \"reason\": \"Customer requested\",\n  \"amount\": 10.79\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/orders/refund",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "orders", "refund"]
+            },
+            "description": "Issue a refund for an order. Calls payment provider refund API."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as Delivered",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-abc123-1700000000\",\n  \"notes\": \"Manual verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/orders/mark-delivered",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "orders", "mark-delivered"]
+            },
+            "description": "Manually mark an order as delivered (for admin verification)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Vouchers",
+      "item": [
+        {
+          "name": "Create Voucher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50.00,\n  \"maxUses\": 1,\n  \"expiresAt\": \"2024-12-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/vouchers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "vouchers"]
+            },
+            "description": "Create a new voucher code. Returns code and details."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Voucher (Manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"voucherCode\": \"GIFT-CARD-TEST\",\n  \"approve\": true,\n  \"notes\": \"Verified by admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/vouchers/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "vouchers", "verify"]
+            },
+            "description": "Manually verify a pending voucher redemption."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voucher Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/vouchers/GIFT-CARD-TEST/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "vouchers", "GIFT-CARD-TEST", "stats"]
+            },
+            "description": "Get usage statistics for a voucher."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.davetopup.com",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "Bearer token_here",
+      "type": "string"
+    }
+  ]
+}
