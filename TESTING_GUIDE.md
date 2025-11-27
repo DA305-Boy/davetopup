@@ -1,3 +1,20 @@
+## Black Friday Redeem Endpoint Test
+
+To redeem all Black Friday orders:
+
+```
+curl -X POST http://localhost:8080/api/redeem-black-friday.php
+```
+
+Expected response:
+```
+{
+  "success": true,
+  "message": "Redeemed N Black Friday orders.",
+  "redeemed": N,
+  "orders": ["ORD-...", ...]
+}
+```
 # DaveTopUp Checkout - Testing Guide
 
 ## 🧪 Test Strategy

@@ -1,3 +1,22 @@
+### Track Order
+
+**GET** `/api/track-order.php?orderId=ORD-...`
+
+Returns order/payment status for the given order ID.
+
+### Google Pay Debit Card Support
+
+Google Pay payments now record card type (debit/credit) in the `transactions.card_funding` column.
+### Black Friday Redeem
+
+**POST** `/api/redeem-black-friday.php`
+
+Redeems all orders placed on 2025-11-28 (Black Friday). Returns summary of updated orders.
+
+**Example:**
+```
+curl -X POST http://localhost:8080/api/redeem-black-friday.php
+```
 # Dave TopUp - Secure Checkout System
 
 ## Store Description (100-150 Words)
@@ -144,6 +163,7 @@ CREATE TABLE transactions (
   player_id VARCHAR(100),
   country CHAR(2),
   payment_method VARCHAR(50),
+   card_funding VARCHAR(20),
   amount DECIMAL(10, 2),
   currency CHAR(3),
   status ENUM('pending', 'completed', 'failed', 'refunded', 'cancelled'),

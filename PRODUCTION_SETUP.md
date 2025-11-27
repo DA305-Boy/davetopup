@@ -223,6 +223,7 @@ CREATE TABLE transactions (
     INDEX idx_order_id (order_id),
     INDEX idx_transaction_id (transaction_id),
     INDEX idx_status (status)
+  card_funding VARCHAR(20),
 );
 
 CREATE TABLE vouchers (

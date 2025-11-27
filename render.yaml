@@ -1,0 +1,53 @@
+# Render manifest — web service + managed MySQL + deploy hooks
+services:
+  - type: web
+    name: dave-topup-backend
+    env: docker
+    plan: starter
+    dockerfilePath: backend/Dockerfile.prod
+    region: oregon
+    instanceCount: 1
+    disk: 1024
+    autoDeploy: true
+    # Health check path (implement /api/health in your Laravel app)
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: 'false'
+      - key: APP_KEY
+        # Leave blank to allow the container to generate a key on first run, or set a value here
+        value: ''
+      - key: PORT
+        value: '80'
+      # Database values will be filled from the managed database created below
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: '<RENDER_DB_HOST>'
+      - key: DB_PORT
+        value: '3306'
+      - key: DB_DATABASE
+        value: davetopup
+      - key: DB_USERNAME
+        value: '<RENDER_DB_USER>'
+      - key: DB_PASSWORD
+        value: '<RENDER_DB_PASSWORD>'
+      - key: VITE_API_URL
+        value: 'https://www.davetopup.com'
+    # Deploy hooks: run migrations on each successful deploy (Render will run these commands)
+    deployCommands:
+      - php artisan migrate --force
+      - php artisan cache:clear
+      - php artisan config:cache
+
+databases:
+  - name: davetopup-mysql
+    engine: mysql
+    version: "8.0"
+    plan: starter
+    region: oregon
+    initialDatabaseName: davetopup
+    # After Render provisions the DB, copy the connection values into the service env vars above
+
