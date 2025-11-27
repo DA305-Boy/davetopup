@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Card - DAWENS SHOP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0; padding: 0;
+  background: #f9f9f9;
+}
+header {
+  background: #fff;
+  padding: 10px 15px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: sticky; top: 0; z-index: 1000;
+}
+.logo img { height: 40px; }
+
+.cart-icon {
+  position: relative;
+  font-size: 22px;
+  color: #2f855a;
+  cursor: pointer;
+}
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: red;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.cart-panel {
+  position: fixed;
+  top: 0; right: -400px;
+  width: 350px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -3px 0 8px rgba(0,0,0,0.2);
+  transition: right 0.3s ease;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+}
+.cart-panel.active { right: 0; }
+
+.cart-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+.cart-header h3 { margin: 0; font-size: 18px; }
+.cart-header button {
+  background: none; border: none; font-size: 20px; cursor: pointer; color: #555;
+}
+.cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+
+.cart-item {
+  display: flex; align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+.cart-item img {
+  width: 60px; height: 60px; border-radius: 6px; object-fit: cover; margin-right: 10px;
+}
+.cart-item-details { flex: 1; }
+.delete-btn {
+  background: none;
+  border: none;
+  color: #d33;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.checkout-btn {
+  background: #2f855a;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 15px;
+}
+.checkout-btn:hover { background: #276749; }
+
+.product-container {
+  max-width: 800px;
+  margin: 30px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+.product-container img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.product-info { text-align: left; margin-top: 20px; }
+.product-info h2 { margin-bottom: 8px; }
+.product-info p { color: #666; font-size: 14px; margin-bottom: 10px; }
+.price { color: #2f855a; font-size: 22px; font-weight: bold; margin: 10px 0; }
+
+select, input {
+  padding: 8px; margin-top: 6px; border: 1px solid #ccc; border-radius: 5px; width: 100%;
+}
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2f855a;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-top: 15px;
+  cursor: pointer;
+  border: none;
+}
+.add-btn:hover { background: #276749; }
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.qty-control button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  background: #eee;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.qty-control input {
+  width: 60px;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 50px;
+  background: #fff;
+  border-top: 1px solid #ddd;
+}
+footer p { margin: 6px 0; font-size: 13px; color: #555; }
+
+.similar {
+  max-width: 900px;
+  margin: 40px auto;
+}
+.similar h3 { margin-bottom: 15px; }
+.similar-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+.similar-products div {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 10px;
+  text-align: center;
+}
+.similar-products img { width: 100%; border-radius: 6px; }
+.similar-products p { margin: 8px 0; font-size: 14px; font-weight: bold; }
+.similar-products span { color: #2f855a; font-weight: bold; }
+.similar-products a {
+  display: inline-block;
+  margin-top: 6px;
+  background: #2f855a;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  text-decoration: none;
+}
+.similar-products a:hover { background: #276749; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><a href="index.html"><img src="https://i.imgur.com/yourLogo.png" alt="DAWENS SHOP"></a></div>
+
+  <div class="cart-icon" id="cartIcon">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <div class="cart-count" id="cartCount">0</div>
+  </div>
+</header>
+
+<!-- CART PANEL -->
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Votre Panier</h3>
+    <button onclick="closeCart()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <button class="checkout-btn" onclick="window.location.href='checkout.html'">Passer à la caisse</button>
+</div>
+
+<div class="product-container">
+  <img src="https://files.catbox.moe/2g77cr.jpeg" alt="Apple Card">
+  <div class="product-info">
+    <h2>Apple Card - Recharge personnalisée</h2>
+    <p>Rechargez votre <strong>Apple Card</strong> avec le montant de votre choix. Sécurisé, rapide, et totalement compatible avec Apple Pay et Wallet.</p>
+    
+    <label for="amount">Montant Apple Card (USD)</label>
+    <input type="number" id="amount" min="50" max="5000" value="100" oninput="updatePrice()"><br>
+
+    <label for="email">Adresse e-mail *</label>
+    <input type="email" id="email" placeholder="Entrez votre Gmail pour recevoir la confirmation">
+
+    <div class="qty-control">
+      <button onclick="changeQty(-1)">-</button>
+      <input type="number" id="qty" value="1" min="1">
+      <button onclick="changeQty(1)">+</button>
+    </div>
+
+    <div class="price" id="displayPrice">$0</div>
+
+    <button class="add-btn" onclick="addToCart()">
+      <i class="fa-solid fa-cart-plus"></i> Ajouter au panier
+    </button>
+  </div>
+</div>
+
+<!-- PRODUITS SIMILAIRES -->
+<div class="similar">
+  <h3>Produits similaires</h3>
+  <div class="similar-products">
+    <div>
+      <img src="https://files.catbox.moe/jbc8as.webp">
+      <p>Apple Watch Series 9</p><span>$399</span><br>
+      <a href="watch.html">Voir</a>
+    </div>
+    <div>
+      <img src="https://files.catbox.moe/ambygx.jpeg">
+      <p>iPhone 15 Pro</p><span>$530.89</span><br>
+      <a href="iphone.html">Voir</a>
+    </div>
+    <div>
+      <img src="https://files.catbox.moe/ofcapw.jpeg">
+      <p>AirPods Max</p><span>$549.99</span><br>
+      <a href="airpods.html">Voir</a>
+    </div>
+    <div>
+      <img src="https://files.catbox.moe/w1dmwq.jpeg">
+      <p>MacBook Air M3</p><span>$1399.00</span><br>
+      <a href="macbook.html">Voir</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>📧 Contact: <a href="mailto:dawenshop@gmail.com">dawenshop@gmail.com</a></p>
+  <p>📞 Support: <a href="contact.html">Cliquez ici pour contacter le support</a></p>
+  <p>&copy; 2025 DAVE TopUp - Tous droits réservés</p>
+</footer>
+
+<script>
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+updateCartCount();
+updatePrice();
+
+function updateCartCount(){
+  document.getElementById('cartCount').textContent = cart.reduce((a,b)=>a+b.quantity,0);
+}
+
+function changeQty(change){
+  const qtyInput = document.getElementById('qty');
+  let qty = parseInt(qtyInput.value);
+  qty = Math.max(1, qty + change);
+  qtyInput.value = qty;
+  updatePrice();
+}
+
+function updatePrice(){
+  const amount = parseFloat(document.getElementById('amount').value);
+  const qty = parseInt(document.getElementById('qty').value);
+  let price = amount * 1.35 * qty;
+  if(price < 50) price = 50;
+  document.getElementById('displayPrice').textContent = "Total: $" + price.toFixed(2);
+  return price;
+}
+
+function addToCart(){
+  const amount = parseFloat(document.getElementById('amount').value);
+  const qty = parseInt(document.getElementById('qty').value);
+  const email = document.getElementById('email').value;
+  const price = updatePrice();
+
+  if(!email.includes("@gmail.com")){
+    alert("Veuillez entrer une adresse Gmail valide pour recevoir la notification.");
+    return;
+  }
+
+  const product = {
+    id: Date.now(),
+    name: `Apple Card +$${amount}`,
+    quantity: qty,
+    price: price,
+    email: email,
+    image: "https://files.catbox.moe/2g77cr.jpeg"
+  };
+  cart.push(product);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  renderCart();
+  openCart();
+}
+
+function renderCart(){
+  const cartItems = document.getElementById('cartItems');
+  cartItems.innerHTML = "";
+  cart.forEach(item => {
+    const div = document.createElement('div');
+    div.classList.add('cart-item');
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <div class="cart-item-details">
+        <h4>${item.name}</h4>
+        <p><strong>$${item.price.toFixed(2)}</strong></p>
+        <p>Qté: ${item.quantity}</p>
+        <p>Notif: ${item.email}</p>
+      </div>
+      <button class="delete-btn" onclick="removeFromCart(${item.id})"><i class="fa-solid fa-trash"></i></button>
+    `;
+    cartItems.appendChild(div);
+  });
+}
+
+function removeFromCart(id){
+  cart = cart.filter(i => i.id !== id);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  renderCart();
+}
+
+function openCart(){ document.getElementById('cartPanel').classList.add('active'); }
+function closeCart(){ document.getElementById('cartPanel').classList.remove('active'); }
+
+document.getElementById('cartIcon').addEventListener('click', openCart);
+</script>
+</body>
+</html>

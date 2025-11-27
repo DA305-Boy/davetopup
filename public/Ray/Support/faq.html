@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — Ray Library</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+  background: #fff;
+  color: #111;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 36px;
+  background: linear-gradient(90deg, #ff3fa1, #7a2cff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(122,44,255,0.3);
+  margin-bottom: 20px;
+}
+
+.accordion {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.qa button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  text-align: left;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #111;
+}
+
+.qa button i {
+  transition: transform 0.3s;
+}
+
+.answer {
+  padding: 0 14px 14px 14px;
+  display: none;
+  color: #333;
+  font-size: 15px;
+}
+
+.qa.open .answer {
+  display: block;
+}
+
+.qa.open button i {
+  transform: rotate(180deg);
+}
+
+/* Leave Comment Section */
+.comments-section {
+  max-width: 100%;
+  margin: 50px auto;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.comment {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.comment-header {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.comment-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #7a2cff;
+}
+
+.replies { margin-left: 20px; margin-top: 10px; }
+
+#comment-form input,
+#comment-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+#comment-form button {
+  padding: 10px 20px;
+  background: #7a2cff;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+#comment-form button:hover {
+  background: #ff3fa1;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 50px;
+  padding: 30px 20px;
+  color: #555;
+  font-size: 14px;
+}
+.footer a {
+  color: #7a2cff;
+  text-decoration: none;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>FAQ — Ray Library</h1>
+
+  <!-- Example 15 FAQ questions -->
+  <div class="accordion">
+    <div class="qa">
+      <button>1. Comment créer un compte ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Pour créer un compte, cliquez sur "S'inscrire" en haut à droite et remplissez le formulaire avec vos informations.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>2. Comment réinitialiser mon mot de passe ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Allez dans "Connexion" et cliquez sur "Mot de passe oublié". Suivez les instructions pour réinitialiser.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>3. Comment emprunter un livre ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Trouvez un livre, cliquez sur "Emprunter" et il sera ajouté à votre bibliothèque personnelle.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>4. Comment retourner un livre ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Dans votre bibliothèque, cliquez sur "Retourner" à côté du livre que vous voulez rendre.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>5. Quels formats de livres sont disponibles ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>PDF, ePub et audio sont disponibles selon le livre sélectionné.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>6. Comment contacter le support ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Vous pouvez nous contacter par email: support@raylibrary.com ou via notre page contact.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>7. Comment fonctionne le système de prêt ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Chaque utilisateur peut emprunter jusqu'à 5 livres simultanément pour une période de 14 jours.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>8. Puis-je accéder aux livres hors ligne ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Oui, vous pouvez télécharger certains livres pour une lecture hors ligne via notre application mobile.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>9. Comment signaler un problème avec un livre ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Ouvrez le livre et cliquez sur "Signaler un problème". Notre équipe examinera rapidement votre demande.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>10. Comment ajouter des commentaires aux livres ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Après avoir lu un livre, cliquez sur "Ajouter un commentaire" sous le livre.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>11. Les livres sont-ils gratuits ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>La plupart des livres sont gratuits, certains premium peuvent nécessiter un abonnement.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>12. Puis-je partager mon compte ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Non, chaque compte est personnel et ne doit pas être partagé.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>13. Quels navigateurs sont pris en charge ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Chrome, Firefox, Edge, Safari et versions récentes des navigateurs mobiles sont pris en charge.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>14. Comment supprimer mon compte ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Contactez le support pour demander la suppression de votre compte.</p>
+      </div>
+    </div>
+    <div class="qa">
+      <button>15. Où puis-je laisser un feedback ? <i class="fas fa-chevron-down"></i></button>
+      <div class="answer">
+        <p>Utilisez la section "Leave a Comment" en bas de cette page pour vos retours.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave a Comment -->
+  <div class="comments-section">
+    <h2>Leave a Comment</h2>
+    <form id="comment-form">
+      <input type="text" placeholder="Votre nom" required>
+      <input type="email" placeholder="Votre email" required>
+      <textarea rows="4" placeholder="Votre commentaire" required></textarea>
+      <button type="submit">Envoyer</button>
+    </form>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>&copy; 2025 Ray Library. Tous droits réservés.</p>
+  <p>Développé avec ❤️ par l'équipe Ray Library</p>
+</div>
+
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script>
+   (function(){
+       emailjs.init("V1u-RTHZGy4JR5f1P"); // Mete ID ou EmailJS
+   })();
+</script>
+<script>
+// Accordion toggle
+document.querySelectorAll('.qa button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const qa = btn.parentElement;
+    qa.classList.toggle('open');
+  });
+});
+
+document.getElementById('comment-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  // Ranmase valè fòm yo
+  const name = this.querySelector('input[type="text"]').value;
+  const email = this.querySelector('input[type="email"]').value;
+  const message = this.querySelector('textarea').value;
+
+  // Voye imel ak EmailJS
+  emailjs.send("service_vuwwek5', 'template_ape7lo2", {
+      from_name: name,
+      from_email: email,
+      message: message,
+      to_email: "berryxoe@gmail.com"  // mete email ou
+  })
+  .then(function(response) {
+      alert("Merci ! Votre commentaire a été envoyé.");
+      document.getElementById('comment-form').reset();
+  }, function(error) {
+      alert("Erreur lors de l'envoi, veuillez réessayer.");
+      console.error(error);
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processing Payment</title>
+<style>
+body{text-align:center;font-family:Poppins,sans-serif;background:#f9fafb;padding-top:100px;}
+h2{color:#2f855a;}
+</style>
+</head>
+<body>
+<h2>Processing votre paiement...</h2>
+<p id="status">Veuillez patienter...</p>
+
+<script>
+// Simulate payment process + API FF top-up
+setTimeout(async ()=>{
+    const cart = JSON.parse(localStorage.getItem("cart")||"[]");
+    const payment = JSON.parse(localStorage.getItem("paymentInfo")||"{}");
+    if(cart.length===0 || !payment){
+        window.location.href="cancel-order.html";
+        return;
+    }
+
+    try {
+        // Mete API reyèl ou la
+        for(const order of cart){
+            await fetch("https://example.com/api/freefireTopup",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({
+                    uid: order.id,
+                    region: order.region,
+                    diamonds: order.item.replace("💎",""),
+                    paymentInfo: payment
+                })
+            });
+        }
+        // Mete order nan localStorage
+        let orders = JSON.parse(localStorage.getItem("orders")||"[]");
+        orders.push({cart,payment,date:new Date().toLocaleString()});
+        localStorage.setItem("orders",JSON.stringify(orders));
+
+        // Clear cart
+        localStorage.removeItem("cart");
+        localStorage.removeItem("paymentInfo");
+
+        // Success
+        window.location.href="success-order.html";
+    } catch(e){
+        console.error(e);
+        window.location.href="cancel-order.html";
+    }
+},2000);
+</script>
+</body>
+</html>

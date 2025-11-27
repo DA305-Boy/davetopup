@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - Dave TopUp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .checkout-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        <!doctype html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Dave TopUp - Checkout</title>
+                <meta http-equiv="refresh" content="0; url=/frontend/index.html" />
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial; background:#f7fafc; display:flex; align-items:center; justify-content:center; height:100vh; margin:0 }
+                    .notice { background:white; padding:24px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06); max-width:720px }
+                    a { color:#0563c1 }
+                </style>
+            </head>
+            <body>
+                <div class="notice">
+                    <h2>Redirecting to the Checkout App</h2>
+                    <p>If you are not redirected automatically, <a href="/frontend/index.html">click here to open the checkout</a>.</p>
+                    <p>This page was replaced by a modern React checkout. To run locally:
+                    <pre>cd frontend
+        npm install
+            display: flex;
+                    </p>
+                </div>
+            </body>
+        </html>
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cart-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-details h4 {
+            color: #1a1a1a;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .item-details p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+
+        .summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .payment-methods {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .payment-option {
+            position: relative;
+        }
+
+        .payment-option input[type="radio"] {
+            display: none;
+        }
+
+        .payment-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            min-height: 100px;
+            gap: 8px;
+        }
+
+        .payment-option input[type="radio"]:checked + .payment-label {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .payment-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .payment-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .security-badges {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .badge::before {
+            content: '✓';
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stripe-element {
+            padding: 12px 15px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .discount-section {
+            background: #f0f8ff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+        }
+
+        .discount-label {
+            font-size: 12px;
+            color: #0056b3;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .discount-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .discount-input input {
+            flex: 1;
+        }
+
+        .discount-input button {
+            width: auto;
+            padding: 10px 15px;
+            background: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .discount-input button:hover {
+            background: #003d82;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Secure Checkout</h1>
+            <div class="header-security">
+                <div class="lock-icon">🔒</div>
+                <span>Secure & Encrypted Payment</span>
+            </div>
+        </div>
+
+        <div class="checkout-wrapper">
+            <!-- Left Column: Cart & User Details -->
+            <div>
+                <!-- Cart Summary -->
+                <div class="section">
+                    <div class="section-title">Order Summary</div>
+                    <div id="cartItems">
+                        <div class="cart-item">
+                            <div class="item-details">
+                                <h4>Free Fire Diamonds</h4>
+                                <p>Quantity: <span id="itemQty">1</span> | UID: <span id="itemUid">123456</span></p>
+                            </div>
+                            <div class="item-price" id="itemPrice">$9.99</div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="discount-section">
+                        <div class="discount-label">Have a promo code?</div>
+                        <div class="discount-input">
+                            <input type="text" id="promoCode" placeholder="Enter code">
+                            <button onclick="applyPromo()">Apply</button>
+                        </div>
+                    </div>
+
+                    <div class="summary">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">$9.99</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Fees</span>
+                            <span id="fees">$0.50</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Discount</span>
+                            <span id="discount" style="color: #28a745;">-$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Total</span>
+                            <span id="total">$10.49</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Payment Details -->
+            <div>
+                <form id="checkoutForm" onsubmit="handleCheckout(event)">
+                    <!-- User Details -->
+                    <div class="section">
+                        <div class="section-title">Your Details</div>
+
+                        <div class="error-message" id="errorMessage"></div>
+                        <div class="success-message" id="successMessage"></div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="playerId">Player ID / Username *</label>
+                                <input type="text" id="playerId" name="playerId" placeholder="e.g., 1234567890" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country *</label>
+                                <select id="country" name="country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="JP">Japan</option>
+                                    <option value="BR">Brazil</option>
+                                    <option value="IN">India</option>
+                                    <option value="ZA">South Africa</option>
+                                    <option value="MX">Mexico</option>
+                                    <option value="SG">Singapore</option>
+                                    <option value="HK">Hong Kong</option>
+                                    <option value="TH">Thailand</option>
+                                    <option value="PH">Philippines</option>
+                                    <option value="ID">Indonesia</option>
+                                    <option value="VN">Vietnam</option>
+                                    <option value="RU">Russia</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="section" style="margin-top: 20px;">
+                        <div class="section-title">Payment Method</div>
+
+                        <div class="payment-methods">
+                            <div class="payment-option">
+                                <input type="radio" id="stripe" name="paymentMethod" value="stripe" checked>
+                                <label for="stripe" class="payment-label">
+                                    <div class="payment-icon">💳</div>
+                                    <div class="payment-name">Credit Card</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="paypal" name="paymentMethod" value="paypal">
+                                <label for="paypal" class="payment-label">
+                                    <div class="payment-icon">🅿️</div>
+                                    <div class="payment-name">PayPal</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="binance" name="paymentMethod" value="binance">
+                                <label for="binance" class="payment-label">
+                                    <div class="payment-icon">₿</div>
+                                    <div class="payment-name">Binance Pay</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="skrill" name="paymentMethod" value="skrill">
+                                <label for="skrill" class="payment-label">
+                                    <div class="payment-icon">💰</div>
+                                    <div class="payment-name">Skrill</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="flutterwave" name="paymentMethod" value="flutterwave">
+                                <label for="flutterwave" class="payment-label">
+                                    <div class="payment-icon">🌊</div>
+                                    <div class="payment-name">Flutterwave</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="stripe2" name="paymentMethod" value="stripe-apple">
+                                <label for="stripe2" class="payment-label">
+                                    <div class="payment-icon">🍎</div>
+                                    <div class="payment-name">Apple Pay</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="google" name="paymentMethod" value="google-pay">
+                                <label for="google" class="payment-label">
+                                    <div class="payment-icon">📱</div>
+                                    <div class="payment-name">Google Pay</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="coinbase" name="paymentMethod" value="coinbase">
+                                <label for="coinbase" class="payment-label">
+                                    <div class="payment-icon">🪙</div>
+                                    <div class="payment-name">Coinbase</div>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" id="crypto" name="paymentMethod" value="crypto">
+                                <label for="crypto" class="payment-label">
+                                    <div class="payment-icon">🔐</div>
+                                    <div class="payment-name">Crypto</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Stripe Payment Element -->
+                        <div id="stripeContainer" class="stripe-element">
+                            <div id="card-element"></div>
+                        </div>
+
+                        <!-- Generic Card Form for other methods -->
+                        <div id="cardFormContainer" style="display: none;">
+                            <div class="form-group">
+                                <label for="cardName">Cardholder Name</label>
+                                <input type="text" id="cardName" placeholder="John Doe">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cardNumber">Card Number</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiry">Expiry Date</label>
+                                    <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvc">CVC</label>
+                                    <input type="text" id="cvc" placeholder="123" maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <button type="submit" class="btn btn-primary">
+                        <span id="btnText">Proceed to Pay $10.49</span>
+                        <div class="loading" id="loading" style="display: none;">
+                            <div class="spinner"></div>
+                            <span>Processing...</span>
+                        </div>
+                    </button>
+
+                    <!-- Security Badges -->
+                    <div class="security-badges">
+                        <div class="badge">SSL Encrypted</div>
+                        <div class="badge">PCI Compliant</div>
+                        <div class="badge">3D Secure</div>
+                    </div>
+
+                    <p style="font-size: 12px; color: #666; margin-top: 15px; text-align: center;">
+                        By proceeding, you agree to our Terms & Conditions and Privacy Policy
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="checkout.js"></script>
+</body>
+</html>

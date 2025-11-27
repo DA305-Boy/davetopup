@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Dave TopUp</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Dave TopUp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .order-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #1a1a1a;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .email-info {
+            background: #e3f2fd;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .next-steps {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #856404;
+            text-align: left;
+        }
+
+        .next-steps h3 {
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #856404;
+        }
+
+        .next-steps ul {
+            margin-left: 20px;
+        }
+
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+
+        .countdown {
+            font-size: 12px;
+            color: #999;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .success-container {
+                padding: 30px 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h1>Payment Successful!</h1>
+        <p class="subtitle">Thank you for your purchase. Your order has been confirmed and will be delivered shortly.</p>
+
+        <div class="email-info">
+            📧 A confirmation email has been sent to <strong id="confirmEmail"></strong>
+        </div>
+
+        <div class="order-details">
+            <div class="detail-row">
+                <span class="detail-label">Order ID</span>
+                <span class="detail-value" id="orderId">ORD-...</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Method</span>
+                <span class="detail-value" id="paymentMethod">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Amount Paid</span>
+                <span class="detail-value" id="amountPaid">$0.00</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total</span>
+                <span class="detail-value" id="totalAmount">$0.00</span>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <h3>⏱️ What Happens Next?</h3>
+            <ul>
+                <li>Your game top-up will be delivered within <strong>5-30 minutes</strong></li>
+                <li>Check your game account for the credits</li>
+                <li>Monitor your email for delivery updates</li>
+                <li>Contact support if you don't receive your order</li>
+            </ul>
+        </div>
+
+        <div class="btn-group">
+            <a href="https://www.davetopup.com/public/index.html" class="btn btn-secondary">
+                ← Continue Shopping
+            </a>
+            <a href="https://www.davetopup.com/public/index.html#account" class="btn btn-primary">
+                View My Orders →
+            </a>
+        </div>
+
+        <div class="countdown">
+            Redirecting in <span id="countdown">10</span> seconds...
+        </div>
+    </div>
+
+    <script>
+        // Parse order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        if (orderId) {
+            document.getElementById('orderId').textContent = orderId;
+            // Fetch order details from backend
+            fetchOrderDetails(orderId);
+        }
+
+        // Auto-redirect countdown
+        let countdown = 10;
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            if (countdown === 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+
+        // Fetch order details from backend
+        async function fetchOrderDetails(orderId) {
+            try {
+                const response = await fetch(`https://www.davetopup.com/api/order-details.php?orderId=${orderId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('confirmEmail').textContent = data.email || 'your email';
+                    document.getElementById('paymentMethod').textContent = data.paymentMethod || '—';
+                    document.getElementById('amountPaid').textContent = '$' + (data.amount ? parseFloat(data.amount).toFixed(2) : '0.00');
+                    document.getElementById('totalAmount').textContent = '$' + (data.total ? parseFloat(data.total).toFixed(2) : '0.00');
+                }
+            } catch (error) {
+                console.error('Error fetching order details:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="top-row">
+        <div class="logo">Dave<span style="color:#ff3b3b">Top</span>Up</div>
+        <div class="search" role="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#bbb" stroke-width="1.5"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="#bbb" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input id="q" placeholder="I'm shopping for..." />
+        </div>
+      </div>
+    </header>
+
+    <!-- hero: use uploaded image local path -->
+    <div class="hero">
+      <img src="/mnt/data/E32BE39B-A592-4EF1-BBED-AD3BBAF69050.jpeg" alt="hero banner">
+    </div>
+
+    <!-- small carousel icons -->
+    <div class="chip-row" id="chips">
+      <!-- JS will fill categories or fallback icons -->
+    </div>
+
+    <h2 class="section">Top Selling Products <a class="viewall" href="#">View All ›</a></h2>
+
+    <!-- compact grid like screenshot -->
+    <div class="grid" id="top-grid">
+      <!-- cards go here -->
+    </div>
+
+    <div class="products" id="products-list">
+      <!-- bigger list will be appended here -->
+    </div>
+
+    <!-- bottom nav -->
+    <div class="bottom-nav">
+      <div class="nav-item">Home</div>
+      <div class="nav-item">Categories</div>
+      <div class="nav-item">Cart (0)</div>
+      <div class="nav-item">My Account</div>
+    </div>
+  </div>
+
+  <script>
+    // === CONFIG (replace with your real API key) ===
+    const API_BASE = 'https://item4gamer.com/wp-json/reseller/v1';
+    const API_KEY = 'YOUR_API_KEY_HERE'; // <-- REPLACE THIS
+
+    // helper for fetch with Authorization
+    async function apiFetch(path, opts = {}) {
+      const headers = Object.assign({
+        'Authorization': 'Bearer ' + API_KEY,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }, opts.headers || {});
+      const res = await fetch(API_BASE + path, Object.assign({}, opts, { headers }));
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error('API error: ' + res.status + ' - ' + text);
+      }
+      return res.json();
+    }
+
+    // fallback local icons for chips if categories fail
+    const defaultChips = [
+      { id: 'codm', name:'Call of Duty', img: 'https://via.placeholder.com/64?text=COD' },
+      { id: 'freefire', name:'Free Fire', img: 'https://via.placeholder.com/64?text=FF' },
+      { id: 'pubg', name:'PUBG', img: 'https://via.placeholder.com/64?text=PUBG' },
+      { id: 'genshin', name:'Genshin', img: 'https://via.placeholder.com/64?text=GI' },
+      { id: 'honka', name:'Honkai', img: 'https://via.placeholder.com/64?text=HK' }
+    ];
+
+    // render chip row
+    function renderChips(categories) {
+      const container = document.getElementById('chips');
+      container.innerHTML = '';
+      const list = categories && categories.length ? categories : defaultChips;
+      list.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'chip';
+        div.innerHTML = `
+          <img src="${cat.img || 'https://via.placeholder.com/64'}" alt="${cat.name}">
+          <div style="font-size:12px">${cat.name}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // render top grid cards (3-up)
+    function renderTopGrid(products) {
+      const container = document.getElementById('top-grid');
+      container.innerHTML = '';
+      const list = products.slice(0,6);
+      list.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const discount = p.discount_percentage || Math.floor(Math.random()*15)+4; // if API has no discount
+        card.innerHTML = `
+          <div class="badge">${discount}%</div>
+          <img src="${p.image || 'https://via.placeholder.com/240'}" alt="${p.name}">
+          <div class="title">${p.name}</div>
+          <div class="meta">
+            <div class="instant">⚡ Instant</div>
+            <div class="rating"> <span>${(p.rating || 4.4).toFixed(2)}</span> ★</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // render larger product list
+    function renderProductList(products) {
+      const container = document.getElementById('products-list');
+      container.innerHTML = '';
+      products.slice(0,12).forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'product-row';
+        row.innerHTML = `
+          <div class="product-card">
+            <img src="${p.image || 'https://via.placeholder.com/160'}" alt="${p.name}">
+            <div class="product-info">
+              <div class="small-badge">${p.category_name || 'Game Credits'}</div>
+              <div style="font-weight:700; margin-bottom:6px">${p.name}</div>
+              <div style="font-size:13px; color:${'#666'}">${p.short_description || ''}</div>
+              <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-weight:800">${p.price ? '$' + p.price : '—'}</div>
+                <div style="font-size:12px; color:var(--muted)">${(p.rating || 4.45).toFixed(2)} ★</div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // try to fetch categories & products
+    async function init() {
+      try {
+        // 1) categories
+        const categoriesResp = await apiFetch('/product/get-categories');
+        // the API sample returns object with data.categories.{index}
+        let cats = [];
+        if (categoriesResp && categoriesResp.data && categoriesResp.data.categories) {
+          const obj = categoriesResp.data.categories;
+          cats = Object.keys(obj).map(k => {
+            return { id: obj[k].id, name: obj[k].name, img: null };
+          });
+        }
+        // attach placeholder images for visual
+        cats = cats.map((c,i)=>({ ...c, img: `https://via.placeholder.com/64?text=${encodeURIComponent(c.name.split(' ')[0].slice(0,3))}` }));
+        renderChips(cats);
+
+        // 2) products list
+        const productsResp = await apiFetch('/product/get-products');
+        // depends on API shape; try to find list
+        let products = [];
+        if (productsResp && productsResp.data && Array.isArray(productsResp.data.products)) {
+          products = productsResp.data.products;
+        } else if (productsResp && productsResp.data && productsResp.data.length) {
+          products = productsResp.data;
+        } else if (productsResp && Array.isArray(productsResp)) {
+          products = productsResp;
+        } else {
+          // fallback: create dummy products from categories
+          products = cats.map((c,i)=>({
+            id: 1000+i, name: c.name + ' Pack', image:'https://via.placeholder.com/240', price: (i+1)*4.99, rating: (4.2 + (i*0.1))
+          }));
+        }
+        // normalize fields for demo
+        products = products.map((p,i)=>({
+          id: p.id || p.product_id || (1000+i),
+          name: p.name || p.title || p.product_name || `Product ${i+1}`,
+          image: (p.image && p.image[0]) || p.image || p.featured_image || `https://via.placeholder.com/240?text=${encodeURIComponent(p.name || 'P')}`,
+          price: p.price || p.amount || (Math.random()*30+1).toFixed(2),
+          rating: p.rating || (4 + Math.random()*1),
+          discount_percentage: p.discount || null,
+          category_name: p.category_name || (cats[i % cats.length] && cats[i % cats.length].name) || 'Misc',
+          short_description: p.short_description || p.description || ''
+        }));
+
+        renderTopGrid(products);
+        renderProductList(products);
+      } catch (err) {
+        console.error(err);
+        // graceful fallback UI
+        renderChips(null);
+        const fallbackProducts = Array.from({length:6}).map((_,i)=>({
+          id: i, name:`Demo Product ${i+1}`, image:'https://via.placeholder.com/240', price:(i+1)*3 + '.00', rating:4.3 + i*0.05
+        }));
+        renderTopGrid(fallbackProducts);
+        renderProductList(fallbackProducts);
+        // show error as floating alert (simple)
+        const msg = document.createElement('div');
+        msg.style.position='fixed'; msg.style.right='12px'; msg.style.top='12px';
+        msg.style.background='rgba(0,0,0,0.75)'; msg.style.color='#fff'; msg.style.padding='10px 12px';
+        msg.style.borderRadius='10px'; msg.style.zIndex=9999; msg.textContent = 'Could not fetch API — check API_KEY and CORS';
+        document.body.appendChild(msg);
+      }
+    }
+
+    // init on load
+    init();
+
+    // BONUS: click search to filter displayed products locally
+    document.getElementById('q').addEventListener('input', e=>{
+      const q = e.target.value.trim().toLowerCase();
+      const allCards = Array.from(document.querySelectorAll('.card .title'));
+      allCards.forEach(t=>{
+        const card = t.closest('.card');
+        card.style.display = t.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

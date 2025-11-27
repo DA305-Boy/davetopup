@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-shirt Noir - DAWENS SHOP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0; padding: 0;
+  background: #f9f9f9;
+}
+header {
+  background: #fff;
+  padding: 10px 15px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: sticky; top: 0; z-index: 1000;
+}
+.logo img { height: 40px; }
+
+.cart-icon {
+  position: relative;
+  font-size: 22px;
+  color: #2f855a;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: red;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Cart panel */
+.cart-panel {
+  position: fixed;
+  top: 0; right: -400px;
+  width: 350px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -3px 0 8px rgba(0,0,0,0.2);
+  transition: right 0.3s ease;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-panel.active { right: 0; }
+
+.cart-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+.cart-header h3 { margin: 0; font-size: 18px; }
+.cart-header button {
+  background: none; border: none; font-size: 20px; cursor: pointer; color: #555;
+}
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  position: relative;
+}
+.cart-item img {
+  width: 60px; height: 60px; border-radius: 6px; object-fit: cover; margin-right: 10px;
+}
+.cart-item-details {
+  flex: 1;
+}
+.cart-item-details h4 { margin: 0; font-size: 15px; }
+.cart-item-details p { margin: 2px 0; font-size: 13px; color: #555; }
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #d33;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.delete-btn:hover { transform: scale(1.1); }
+
+.checkout-btn {
+  background: #2f855a;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 15px;
+}
+.checkout-btn:hover { background: #276749; }
+
+.product-container {
+  max-width: 800px;
+  margin: 30px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+.product-container img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.product-info { text-align: left; margin-top: 20px; }
+.product-info h2 { margin-bottom: 8px; }
+.product-info p { color: #666; font-size: 14px; margin-bottom: 10px; }
+.price { color: #2f855a; font-size: 20px; font-weight: bold; margin: 10px 0; }
+select, input {
+  padding: 8px; margin-top: 6px; border: 1px solid #ccc; border-radius: 5px;
+}
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2f855a;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-top: 15px;
+  cursor: pointer;
+  border: none;
+}
+.add-btn:hover { background: #276749; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><a href="index.html"><img src="https://files.catbox.moe/o1ai21.png" alt="DAWENS SHOP"></a></div>
+
+  <!-- Cart Icon -->
+  <div class="cart-icon" id="cartIcon">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <div class="cart-count" id="cartCount">0</div>
+  </div>
+</header>
+
+<!-- CART PANEL -->
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Votre Panier</h3>
+    <button onclick="closeCart()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <button class="checkout-btn" onclick="window.location.href='https://914e4594-d234-45b9-8574-5194ab939b42.paylinks.godaddy.com/WOMENS-DNA'">Passer à la caisse</button>
+</div>
+
+<div class="product-container">
+  <img src="https://files.catbox.moe/hpgnd2.jpeg" alt="T-shirt Noir">
+  <div class="product-info">
+    <h2>WOMENS DNA OVERSIZED T-SHIRT - SUMMIT BLUE</h2>
+    <p>WOMENS DNA OVERSIZED T-SHIRT - SUMMIT BLUE unisexe de haute qualité, confortable et élégant.</p>
+    <div class="price">$100</div>
+
+    <label for="size">Taille :</label><br>
+    <select id="size">
+      <option value="S">S</option>
+      <option value="M">M</option>
+      <option value="L">L</option>
+      <option value="XL">XL</option>
+    </select><br><br>
+
+    <label for="quantity">Quantité :</label><br>
+    <input type="number" id="quantity" min="1" max="10" value="1"><br><br>
+
+    <button class="add-btn" onclick="addToCart()">
+      <i class="fa-solid fa-cart-plus"></i> Ajouter au panier
+    </button>
+  </div>
+</div>
+
+<script>
+let cartCount = 0;
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function updateCartCount(){
+  document.getElementById('cartCount').textContent = cart.reduce((a,b)=>a+b.quantity,0);
+}
+updateCartCount();
+
+function addToCart(){
+  const size = document.getElementById('size').value;
+  const qty = parseInt(document.getElementById('quantity').value);
+  const product = {
+    id: Date.now(),
+    name: "WOMENS DNA OVERSIZED T-SHIRT - SUMMIT BLUE",
+    size: size,
+    quantity: qty,
+    price: 100,
+    image: "https://files.catbox.moe/hpgnd2.jpeg"
+  };
+  cart.push(product);
+  localStorage.setItem('cart', JSON.stringify(cart)); // save cart
+  updateCartCount();
+  renderCart();
+  openCart();
+}
+
+function renderCart(){
+  const cartItems = document.getElementById('cartItems');
+  cartItems.innerHTML = "";
+  cart.forEach(item => {
+    const div = document.createElement('div');
+    div.classList.add('cart-item');
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <div class="cart-item-details">
+        <h4>${item.name}</h4>
+        <p>Taille: ${item.size}</p>
+        <p>Quantité: ${item.quantity}</p>
+        <p><strong>$${item.price * item.quantity}</strong></p>
+      </div>
+      <button class="delete-btn" onclick="removeFromCart(${item.id})">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
+    cartItems.appendChild(div);
+  });
+}
+
+function removeFromCart(id){
+  const item = cart.find(i => i.id === id);
+  if(item){
+    cart = cart.filter(i => i.id !== id);
+    localStorage.setItem('cart', JSON.stringify(cart)); // update storage
+    updateCartCount();
+    renderCart();
+  }
+}
+
+function openCart(){
+  document.getElementById('cartPanel').classList.add('active');
+}
+function closeCart(){
+  document.getElementById('cartPanel').classList.remove('active');
+}
+
+document.getElementById('cartIcon').addEventListener('click', openCart);
+
+// Checkout button
+function goToCheckout(){
+  if(cart.length === 0){
+    alert("Votre panier est vide !");
+    return;
+  }
+  // save cart in localStorage for record (optional)
+  localStorage.setItem('cart', JSON.stringify(cart));
+  // Redirect to GoDaddy PayLink
+  window.location.href = 'https://914e4594-d234-45b9-8574-5194ab939b42.paylinks.godaddy.com/WOMENS-DNA';
+}
+</script>
+
+</body>
+</html>

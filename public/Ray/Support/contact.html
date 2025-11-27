@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>À propos — Dave</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #0a0a0a;
+  --card: #111;
+  --radius: 18px;
+  --shadow: 0 10px 30px rgba(0,0,0,0.6);
+  --c1: #ff3fa1;
+  --c2: #7a2cff;
+  --c3: #00ffd5;
+  --c4: #ffbf00;
+  --c5: #ff4c4c;
+  --c6: #00ff88;
+  --c7: #ff70ff;
+  --c8: #ffaa00;
+  --c9: #4c6cff;
+  --c10: #ff77aa;
+}
+
+body {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg);
+  color: #fff;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 36px;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px var(--c1);
+  text-align: center;
+}
+
+p.intro {
+  text-align:center;
+  max-width:700px;
+  margin:auto;
+  font-size:16px;
+  color:#bbb;
+  margin-bottom:30px;
+}
+
+.contacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.contact-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(255,255,255,0.2);
+}
+
+.contact-card i {
+  font-size: 36px;
+  margin-bottom: 10px;
+  display:block;
+  transition: 0.3s;
+}
+
+/* Different colors for each card icon and title */
+.contact-card:nth-child(1) i, .contact-card:nth-child(1) h3 { color: var(--c1); text-shadow: 0 0 8px var(--c1);}
+.contact-card:nth-child(2) i, .contact-card:nth-child(2) h3 { color: var(--c2); text-shadow: 0 0 8px var(--c2);}
+.contact-card:nth-child(3) i, .contact-card:nth-child(3) h3 { color: var(--c3); text-shadow: 0 0 8px var(--c3);}
+.contact-card:nth-child(4) i, .contact-card:nth-child(4) h3 { color: var(--c4); text-shadow: 0 0 8px var(--c4);}
+.contact-card:nth-child(5) i, .contact-card:nth-child(5) h3 { color: var(--c5); text-shadow: 0 0 8px var(--c5);}
+.contact-card:nth-child(6) i, .contact-card:nth-child(6) h3 { color: var(--c6); text-shadow: 0 0 8px var(--c6);}
+.contact-card:nth-child(7) i, .contact-card:nth-child(7) h3 { color: var(--c7); text-shadow: 0 0 8px var(--c7);}
+.contact-card:nth-child(8) i, .contact-card:nth-child(8) h3 { color: var(--c8); text-shadow: 0 0 8px var(--c8);}
+.contact-card:nth-child(9) i, .contact-card:nth-child(9) h3 { color: var(--c9); text-shadow: 0 0 8px var(--c9);}
+.contact-card:nth-child(10) i, .contact-card:nth-child(10) h3 { color: var(--c10); text-shadow: 0 0 8px var(--c10);}
+
+.contact-card h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.contact-card p {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.footer {
+  background: #111;
+  color: #fff;
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: 50px;
+  box-shadow: 0 -5px 15px rgba(255,255,255,0.1);
+}
+
+.footer p {
+  font-size: 14px;
+  margin: 10px 0;
+  color: #bbb;
+}
+
+.footer a {
+  color: var(--c1);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>À propos de Dave</h1>
+  <p class="intro">Bienvenue sur notre page à propos ! Vous pouvez nous contacter via différents moyens. Chaque contact a un style lumineux et moderne.</p>
+
+  <div class="contacts">
+    <div class="contact-card">
+      <i class="fas fa-envelope"></i>
+      <h3>Email</h3>
+      <p>Envoyez-nous un email pour toute question rapide.<br>support@Ray.com</p>
+    </div>
+    <div class="contact-card">
+      <i class="fas fa-phone"></i>
+      <h3>Téléphone</h3>
+      <p>Appelez-nous pour assistance rapide.<br>+1 234 567 890</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-whatsapp"></i>
+      <h3>WhatsApp</h3>
+      <p>Discutez avec notre équipe via WhatsApp.<br>Réponse rapide garantie !</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-telegram"></i>
+      <h3>Telegram</h3>
+      <p>Rejoignez notre canal pour mises à jour et support.</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-facebook-messenger"></i>
+      <h3>Messenger</h3>
+      <p>Envoyez-nous un message sur Messenger.</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-discord"></i>
+      <h3>Discord</h3>
+      <p>Rejoignez notre serveur pour support communautaire.</p>
+    </div>
+    <div class="contact-card">
+      <i class="fas fa-map-marker-alt"></i>
+      <h3>Adresse</h3>
+      <p>Visitez notre bureau pour rencontrer l'équipe.<br>123 Rue Principale, Paris</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-linkedin"></i>
+      <h3>LinkedIn</h3>
+      <p>Connectez-vous avec notre équipe professionnelle.</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-twitter"></i>
+      <h3>Twitter</h3>
+      <p>Suivez-nous pour toutes les dernières mises à jour.</p>
+    </div>
+    <div class="contact-card">
+      <i class="fab fa-instagram"></i>
+      <h3>Instagram</h3>
+      <p>Découvrez nos projets et coulisses sur Instagram.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>&copy; 2025 Ray. Tous droits réservés.</p>
+  <p>Développé avec ❤️ par l'équipe Dave</p>
+  <p><a href="privacy.html">Politique de confidentialité</a> | <a href="terms.html">Conditions d'utilisation</a></p>
+</div>
+
+</body>
+</html>

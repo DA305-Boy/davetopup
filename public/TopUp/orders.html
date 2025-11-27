@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders - Dave TopUp</title>
+<style>
+body{font-family:Poppins,sans-serif;background:#f9fafb;margin:0;color:#222}
+main{margin:80px auto;padding:20px;max-width:800px;background:white;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{border:1px solid #ccc;padding:8px;text-align:left}
+th{background:#2f855a;color:white}
+</style>
+</head>
+<body>
+<main>
+<h2>All Orders</h2>
+<table>
+<thead>
+<tr><th>ID</th><th>Nom</th><th>Email</th><th>Produit</th><th>Prix</th><th>Statut</th></tr>
+</thead>
+<tbody id="orderBody"></tbody>
+</table>
+</main>
+
+<script>
+async function loadOrders(){
+  try{
+    const res=await fetch('/api/orders');
+    const data=await res.json();
+    const tbody=document.getElementById("orderBody");
+    tbody.innerHTML="";
+    data.forEach(o=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${o.id}</td><td>${o.name}</td><td>${o.email}</td><td>${o.items.map(i=>i.item).join(", ")}</td><td>$${o.total.toFixed(2)}</td><td>${o.status}</td>`;
+      tbody.appendChild(tr);
+    });
+  }catch(e){console.error(e);}
+}
+loadOrders();
+</script>
+</body>
+</html>

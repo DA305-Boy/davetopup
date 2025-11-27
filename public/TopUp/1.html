@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top-up | Free Fire</title>
+  <style>
+/* Reset ak baz */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: #111;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Seksyon tit */
+.title-sec {
+  padding: 20px 24px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* Stats */
+.stats span {
+  margin-right: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Game box */
+.game-box {
+  display: flex;
+  gap: 20px;
+  padding: 20px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+}
+
+.game-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.rating {
+  background-color: #ffe600;
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* Promo box */
+.promo {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  margin: 16px 24px;
+  border-radius: 14px;
+  background-color: #fff8e6;
+  border: 1px solid #ffe2a0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  font-size: 15px;
+  color: #333;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 12px;
+  padding: 12px 24px;
+  overflow-x: auto;
+}
+
+.tabs button {
+  padding: 8px 18px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.tabs button:hover {
+  background-color: #f0f0f0;
+}
+
+.tabs .active {
+  background-color: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+/* Products container */
+#productsContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 kolòn sou desktop */
+  gap: 15px;
+  padding: 15px;
+}
+
+/* Pou ekran mobil */
+@media (max-width: 600px) {
+  #productsContainer {
+    grid-template-columns: 2fr 1fr; /* premye kolòn pi laj */
+  }
+}
+
+/* Chak pwodwi */
+#productsContainer .card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#productsContainer .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* Imaj pwodwi menm gwosè */
+#productsContainer .card-img {
+  width: 150px;          /* gwosè fiks pou tout imaj */
+  height: 100px;
+  object-fit: contain;    /* kenbe pwopòsyon san koupe */
+  border-radius: 12px;
+  margin: 0 auto 10px auto;
+  background: #f5f5f5;
+}
+
+/* Non pwodwi */
+#productsContainer .card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 5px 0;
+  color: #222;
+}
+
+/* Pri pwodwi */
+#productsContainer .price {
+  margin-top: 5px;
+  color: #ff8400;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.quantity-box {
+  padding: 20px;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 10px 0 20px;
+}
+
+.counter button {
+  width: 35px;
+  height: 35px;
+  font-size: 22px;
+  border: none;
+  background: #eee;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-buy {
+  width: 100%;
+  padding: 14px;
+  background: #ffcc00;
+  border-radius: 10px;
+  border: none;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-buy:hover {
+  background: #ffb700;
+}
+
+/* Modal Background */
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Box */
+.modal-box {
+  width: 90%;
+  max-width: 380px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* Notes */
+.note {
+  background: #fff8d7;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.error {
+  color: red;
+  margin-top: 5px;
+}
+
+.submit {
+  width: 100%;
+  background: #f6d96f;
+  border: none;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* =========================
+   LANG DISPLAY BUTTON (POU KLIKE)
+========================= */
+.lang {
+  cursor: pointer;
+  padding: 10px 18px;
+  background-color: #fff;       /* blan pou li klè */
+  color: #111;                  /* tèks nwa pou kontrast */
+  border-radius: 12px;          /* kwen awondi */
+  display: inline-block;
+  font-weight: 600;
+  font-size: 14px;
+  border: 2px solid #111;      /* antoure ak yon border nwa */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+.lang:hover {
+  background-color: #f0f0f0;   /* efè hover lew pase sourit */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+}
+/* =========================
+   MODAL BASE
+========================= */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none; /* hidden by default */
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  padding: 16px; /* pou respènsif sou ti ekran */
+}
+
+/* =========================
+   MODAL CONTENT
+========================= */
+.modal-content {
+  background: #fff;
+  padding: 30px 28px;
+  border-radius: 16px;
+  min-width: 300px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+/* TITRE */
+.modal-content h3 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+}
+
+/* LABELS */
+.modal-content label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+/* SELECT BOX */
+.modal-content select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.modal-content select:focus {
+  border-color: #111;
+  box-shadow: 0 0 6px rgba(17,17,17,0.2);
+}
+
+/* BUTTON SAVE */
+.modal-content button {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.modal-content button:hover {
+  background-color: #222;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">DaveTopUp</div>
+  <!-- LANGUAGE / CURRENCY DISPLAY -->
+<div class="lang" id="langBtn">EN / USD</div>
+
+<!-- MODAL -->
+<div class="modal" id="langModal">
+  <div class="modal-content">
+    <h3>Select Language & Currency</h3>
+    
+    <label for="selectLang">Language / Country:</label>
+    <select id="selectLang">
+      <option value="EN">English</option>
+      <option value="FR">Français</option>
+      <option value="ES">Español</option>
+      <option value="DE">Deutsch</option>
+      <option value="IT">Italiano</option>
+      <option value="PT">Português</option>
+      <option value="RU">Русский</option>
+      <option value="ZH">中文</option>
+      <option value="JA">日本語</option>
+      <option value="KO">한국어</option>
+      <option value="AR">العربية</option>
+      <option value="HI">हिन्दी</option>
+      <option value="TR">Türkçe</option>
+      <option value="NL">Nederlands</option>
+      <option value="PL">Polski</option>
+      <option value="SV">Svenska</option>
+      <option value="NO">Norsk</option>
+      <option value="DA">Dansk</option>
+      <option value="FI">Suomi</option>
+      <option value="HE">עברית</option>
+    </select>
+
+    <label for="selectCurrency">Currency:</label>
+    <select id="selectCurrency">
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+      <option value="JPY">JPY</option>
+      <option value="AUD">AUD</option>
+      <option value="CAD">CAD</option>
+      <option value="CHF">CHF</option>
+      <option value="CNY">CNY</option>
+      <option value="SEK">SEK</option>
+      <option value="NZD">NZD</option>
+      <option value="SGD">SGD</option>
+      <option value="HKD">HKD</option>
+      <option value="NOK">NOK</option>
+      <option value="MXN">MXN</option>
+      <option value="BRL">BRL</option>
+      <option value="ZAR">ZAR</option>
+      <option value="INR">INR</option>
+      <option value="RUB">RUB</option>
+      <option value="KRW">KRW</option>
+      <option value="TRY">TRY</option>
+    </select>
+
+    <button id="saveBtn">Save</button>
+  </div>
+</div>
+</header>
+
+<section class="title-sec">
+  <h2>Top-up</h2>
+  <div class="stats">
+    <span>⚡ Fast</span>
+    <span>🛡 Safe</span>
+    <span>🔄 24/7</span>
+  </div>
+</section>
+
+<section class="game-box">
+  <img src="https://files.catbox.moe/pkovl9.jpeg" class="game-img">
+  <div class="game-info">
+    <h3>Free Fire</h3>
+    <p>100k+ Sold</p>
+    <div class="rating">⭐ 5.0 (15,743)</div>
+  </div>
+</section>
+
+<section class="promo">
+  <div class="gift">🎁</div>
+  <span>Invite Friends and Get <b>3×10%</b> OFF Discount</span>
+</section>
+
+<div class="tabs">
+  <button class="active">Americas</button>
+  <button>Brazil</button>
+  <button>Malaysia</button>
+  <button>Indonesia</button>
+</div>
+
+<div id="productsContainer"></div>
+
+<section class="quantity-box">
+  <label>Quantity</label>
+  <div class="counter">
+    <button>-</button>
+    <span>1</span>
+    <button>+</button>
+  </div>
+
+  <div class="final-price">
+    <label>Price</label>
+    <strong>$12.89</strong>
+  </div>
+
+<button class="btn-buy" id="openModal">Top-up Now</button>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal-box">
+    <span class="close" id="closeModal">&times;</span>
+
+    <h2>Order Information</h2>
+
+    <label>*UID</label>
+    <input type="text" id="uidInput" placeholder="Please fill in the game UID" class="input">
+
+    <p class="note">Profile will be verified at Top-up Now</p>
+    <p class="error" id="errorMsg" style="display:none;">UID is required</p>
+
+    <button class="submit" id="submitTopup">Top-up Now</button>
+  </div>
+</div>
+</section>
+
+
+<script>
+(function() {
+  // =========================
+  // VARIABLES
+  // =========================
+  const container = document.getElementById("productsContainer");
+  const finalPriceEl = document.querySelector('.final-price strong');
+  const qtyCounter = document.querySelector('.counter');
+  const qtyDisplay = qtyCounter ? qtyCounter.querySelector('span') : null;
+  const btns = qtyCounter ? qtyCounter.querySelectorAll('button') : [];
+  let selectedCardIndex = 0;
+  let quantity = 1;
+
+  // =========================
+  // PRICE FUNCTIONS
+  // =========================
+  function parsePrice(text) {
+    if(!text) return 0;
+    const num = text.replace(/[^0-9.,]/g,'').replace(',', '.');
+    return parseFloat(num) || 0;
+  }
+
+  function formatPrice(num, currencySymbol = '$') {
+    return currencySymbol + num.toFixed(2);
+  }
+
+  function getCurrencySymbol() {
+    const currency = localStorage.getItem('currency') || 'USD';
+    const map = { USD:'$', EUR:'€', GBP:'£' };
+    return map[currency] || '$';
+  }
+
+  function updateFinalPrice() {
+    if(!container.children.length || !finalPriceEl) return;
+    const card = container.children[selectedCardIndex];
+    const priceEl = card.querySelector('.price');
+    const base = parseFloat(priceEl.dataset.basePrice);
+    const total = base * Math.max(1, quantity);
+    finalPriceEl.textContent = formatPrice(total, getCurrencySymbol());
+  }
+
+  function setSelected(index) {
+    selectedCardIndex = index;
+    const cards = Array.from(container.children);
+    cards.forEach((c,i) => {
+      if(i === index){
+        c.classList.add('selected');
+        c.style.boxShadow = '0 6px 18px rgba(0,0,0,0.18)';
+        c.style.border = '2px solid #f5c842';
+      } else {
+        c.classList.remove('selected');
+        c.style.boxShadow = '';
+        c.style.border = '';
+      }
+    });
+    updateFinalPrice();
+  }
+
+  // =========================
+  // BUTTONS QUANTITY
+  // =========================
+  if(btns && btns.length >= 2 && qtyDisplay){
+    const [minusBtn, plusBtn] = btns;
+    minusBtn.addEventListener('click', () => {
+      if(quantity > 1) quantity--;
+      qtyDisplay.textContent = quantity;
+      updateFinalPrice();
+    });
+    plusBtn.addEventListener('click', () => {
+      quantity++;
+      qtyDisplay.textContent = quantity;
+      updateFinalPrice();
+    });
+  }
+
+  // =========================
+  // REGION / PRODUCTS DATA
+  // =========================
+  const regionData = {
+    "Americas": [
+      { img:"https://files.catbox.moe/yourimage2.png", name:"FFWS RING 50 PULLS", price:12.89 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"BIZON RING 50 PULLS", price:12.89 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"EVO VAULT - one of the EVO Guns", price:12.89 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"DIGIMON M590 RING 50 PULLS", price:12.89 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"Monthly Membership", price:8.63 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"BOOYAH PASS", price:3.43 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"BOOYAH PASS PLUS", price:9.45 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"BOOYAH PASS 50 Level Package", price:6.87 },
+      { img:"https://files.catbox.moe/yourimage2.png", name:"100+10 Diamonds", price:0.86 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"310+31 Diamonds", price:2.57 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"520+52 Diamonds", price:4.30 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"1060+106 Diamonds", price:8.59 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"2180+218 Diamonds", price:17.12 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"5600+560 Diamonds", price:42.99 },
+      { img:"https://files.catbox.moe/yourimage3.png", name:"PRIME 8 PRIVILEGES", price:1601.07 }
+    ],
+    "Brazil": [
+      { img:"https://files.catbox.moe/yourimage3.png", name:"BIZON RING 50 PULLS", price:9.99 }
+    ],
+    "Malaysia": [
+      { img:"https://files.catbox.moe/dummy1.png", name:"MY SPECIAL PACK", price:7.50 }
+    ],
+    "Indonesia": [
+      { img:"https://files.catbox.moe/dummy2.png", name:"IDN BONUS BOX", price:6.20 }
+    ]
+  };
+
+  const tabs = document.querySelectorAll(".tabs button");
+
+  // =========================
+  // RENDER PRODUCTS
+  // =========================
+  function changeRegion(region) {
+    const regionProducts = regionData[region];
+    if(!regionProducts) return;
+
+    container.innerHTML = ""; // retire tout ansyen pwodwi
+
+    regionProducts.forEach(item => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+
+      card.innerHTML = `
+        <img src="${item.img}" class="card-img">
+        <h4>${item.name}</h4>
+        <div class="price" data-base-price="${item.price}">$${item.price.toFixed(2)}</div>
+      `;
+
+      // ajoute klik pou seleksyone
+      card.addEventListener('click', () => {
+        const allCards = Array.from(container.children);
+        setSelected(allCards.indexOf(card));
+      });
+
+      container.appendChild(card);
+    });
+
+    // toujou mete premye pwodwi seleksyone
+    setSelected(0);
+    
+    // update tabs
+    tabs.forEach(btn => btn.classList.remove("active"));
+    [...tabs].find(b => b.textContent.trim() === region)?.classList.add("active");
+  }
+
+  tabs.forEach(btn => btn.addEventListener('click', () => changeRegion(btn.textContent.trim())));
+
+  // chaje default
+  changeRegion("Americas");
+
+
+
+ // =========================
+  // LANGUAGE / CURRENCY SYSTEM
+  // =========================
+  const langBtn = document.getElementById('langBtn');
+  const modal = document.getElementById('langModal');
+  const saveBtn = document.getElementById('saveBtn');
+  const selectLang = document.getElementById('selectLang');
+  const selectCurrency = document.getElementById('selectCurrency');
+
+  // Egzanp translations, ranplase ak tout 20 lang ou genyen
+  const translations = {
+  "EN": { "topup_title": "Top-up your account", "fast": "Fast", "safe": "Safe", "support": "Support", "promo": "Special Promo", "uid_label": "Enter UID", "topup_btn": "Top-up Now" },
+  "FR": { "topup_title": "Rechargez votre compte", "fast": "Rapide", "safe": "Sûr", "support": "Support", "promo": "Promo spéciale", "uid_label": "Entrez l'UID", "topup_btn": "Recharger maintenant" },
+  "ES": { "topup_title": "Recarga tu cuenta", "fast": "Rápido", "safe": "Seguro", "support": "Soporte", "promo": "Promoción especial", "uid_label": "Introduce UID", "topup_btn": "Recargar ahora" },
+  "DE": { "topup_title": "Lade dein Konto auf", "fast": "Schnell", "safe": "Sicher", "support": "Support", "promo": "Sonderangebot", "uid_label": "UID eingeben", "topup_btn": "Jetzt aufladen" },
+  "IT": { "topup_title": "Ricarica il tuo account", "fast": "Veloce", "safe": "Sicuro", "support": "Supporto", "promo": "Promozione speciale", "uid_label": "Inserisci UID", "topup_btn": "Ricarica ora" },
+  "PT": { "topup_title": "Recarregue sua conta", "fast": "Rápido", "safe": "Seguro", "support": "Suporte", "promo": "Promo especial", "uid_label": "Digite UID", "topup_btn": "Recarregar agora" },
+  "RU": { "topup_title": "Пополнить счет", "fast": "Быстро", "safe": "Безопасно", "support": "Поддержка", "promo": "Специальная акция", "uid_label": "Введите UID", "topup_btn": "Пополнить сейчас" },
+  "ZH": { "topup_title": "充值账户", "fast": "快速", "safe": "安全", "support": "支持", "promo": "特别优惠", "uid_label": "输入UID", "topup_btn": "立即充值" },
+  "JA": { "topup_title": "アカウントをチャージ", "fast": "速い", "safe": "安全", "support": "サポート", "promo": "特別プロモーション", "uid_label": "UIDを入力", "topup_btn": "今すぐチャージ" },
+  "KO": { "topup_title": "계정 충전", "fast": "빠름", "safe": "안전", "support": "지원", "promo": "특별 프로모션", "uid_label": "UID 입력", "topup_btn": "지금 충전" },
+  "AR": { "topup_title": "اشحن حسابك", "fast": "سريع", "safe": "آمن", "support": "الدعم", "promo": "عرض خاص", "uid_label": "أدخل UID", "topup_btn": "اشحن الآن" },
+  "HI": { "topup_title": "अपने खाते को रिचार्ज करें", "fast": "तेज़", "safe": "सुरक्षित", "support": "सहायता", "promo": "विशेष प्रोमो", "uid_label": "UID दर्ज करें", "topup_btn": "अब रिचार्ज करें" },
+  "TR": { "topup_title": "Hesabınızı yükleyin", "fast": "Hızlı", "safe": "Güvenli", "support": "Destek", "promo": "Özel promosyon", "uid_label": "UID girin", "topup_btn": "Şimdi yükle" },
+  "NL": { "topup_title": "Laad je account op", "fast": "Snel", "safe": "Veilig", "support": "Ondersteuning", "promo": "Speciale promotie", "uid_label": "Voer UID in", "topup_btn": "Nu opladen" },
+  "PL": { "topup_title": "Doładuj swoje konto", "fast": "Szybko", "safe": "Bezpiecznie", "support": "Wsparcie", "promo": "Specjalna promocja", "uid_label": "Wprowadź UID", "topup_btn": "Doładuj teraz" },
+  "SV": { "topup_title": "Fyll på ditt konto", "fast": "Snabbt", "safe": "Säkert", "support": "Support", "promo": "Specialerbjudande", "uid_label": "Ange UID", "topup_btn": "Fyll på nu" },
+  "NO": { "topup_title": "Fyll på kontoen din", "fast": "Rask", "safe": "Sikker", "support": "Support", "promo": "Spesialtilbud", "uid_label": "Skriv inn UID", "topup_btn": "Fyll på nå" },
+  "DA": { "topup_title": "Genoplad din konto", "fast": "Hurtig", "safe": "Sikker", "support": "Support", "promo": "Specialtilbud", "uid_label": "Indtast UID", "topup_btn": "Genoplad nu" },
+  "FI": { "topup_title": "Lataa tilisi", "fast": "Nopea", "safe": "Turvallinen", "support": "Tuki", "promo": "Erikoistarjous", "uid_label": "Syötä UID", "topup_btn": "Lataa nyt" },
+  "HE": { "topup_title": "טען את החשבון שלך", "fast": "מהיר", "safe": "בטוח", "support": "תמיכה", "promo": "מבצע מיוחד", "uid_label": "הזן UID", "topup_btn": "טען עכשיו" }
+};
+
+  function applyTranslations(lang) {
+    const t = translations[lang] || translations["EN"];
+    const title = document.querySelector('.title-sec h2');
+    if(title) title.textContent = t["topup_title"];
+
+    const stats = document.querySelectorAll('.stats span');
+    if(stats.length >= 3){
+      stats[0].textContent = t["fast"];
+      stats[1].textContent = t["safe"];
+      stats[2].textContent = t["support"];
+    }
+
+    const promoSpan = document.querySelector('.promo span');
+    if(promoSpan) promoSpan.textContent = t["promo"];
+
+    const uidInput = document.getElementById('uidInput');
+    if(uidInput) uidInput.placeholder = t["uid_label"];
+
+    const submitBtn = document.getElementById('submitTopup');
+    if(submitBtn) submitBtn.textContent = t["topup_btn"];
+  }
+
+  // Bouton ouvè modal
+  if(langBtn) langBtn.addEventListener('click', () => {
+    if(modal) modal.style.display = 'flex';
+  });
+
+  // Fè modal fèmen lè klike deyò
+  if(modal) modal.addEventListener('click', e => {
+    if(e.target === modal) modal.style.display = 'none';
+  });
+
+  // Bouton save
+  if(saveBtn){
+    saveBtn.addEventListener('click', () => {
+      const lang = selectLang ? selectLang.value : 'EN';
+      const currency = selectCurrency ? selectCurrency.value : 'USD';
+      localStorage.setItem('lang', lang);
+      localStorage.setItem('currency', currency);
+      if(langBtn) langBtn.textContent = `${lang} / ${currency}`;
+
+      if(modal) modal.style.display = 'none';
+
+      // Update pri tout kat yo
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        const priceEl = card.querySelector('.price');
+        if(priceEl && priceEl.dataset.basePrice){
+          const base = parseFloat(priceEl.dataset.basePrice);
+          priceEl.textContent = formatPrice(base, getCurrencySymbol());
+        }
+      });
+
+      // Update pri final total
+      if(typeof updateFinalPrice === 'function') updateFinalPrice();
+
+      // Aplike tradiksyon lang
+      applyTranslations(lang);
+    });
+  }
+
+
+  // =========================
+  // TOPUP MODAL
+  // =========================
+  const modalBg = document.getElementById("modalBg");
+  const openModal = document.getElementById("openModal");
+  const closeModal = document.getElementById("closeModal");
+  const submitTopup = document.getElementById("submitTopup");
+  const uidInput = document.getElementById("uidInput");
+  const errorMsg = document.getElementById("errorMsg");
+
+  openModal.onclick = () => modalBg.style.display = "flex";
+  closeModal.onclick = () => modalBg.style.display = "none";
+  window.onclick = e => { if(e.target === modalBg) modalBg.style.display = "none"; };
+
+  submitTopup.onclick = () => {
+    if(uidInput.value.trim() === "") {
+      errorMsg.style.display = "block";
+    } else {
+      window.location.href = "checkout.html";
+    }
+  };
+
+  // =========================
+  // INITIAL SETTINGS
+  // =========================
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('lang') || 'EN';
+    const savedCurrency = localStorage.getItem('currency') || 'USD';
+    selectLang.value = savedLang;
+    selectCurrency.value = savedCurrency;
+    langBtn.textContent = `${savedLang} / ${savedCurrency}`;
+
+    cards.forEach(card => {
+      const priceEl = card.querySelector('.price');
+      if(priceEl && priceEl.dataset.basePrice) {
+        const base = parseFloat(priceEl.dataset.basePrice);
+        priceEl.textContent = formatPrice(base, getCurrencySymbol());
+      }
+    });
+
+    updateFinalPrice();
+    applyTranslations(savedLang);
+  });
+
+})();
+</script>
+</body>
+</html>

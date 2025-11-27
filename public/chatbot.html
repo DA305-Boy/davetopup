@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dawens Chatbot Pro+</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+  --bg-dark:#0f172a;
+  --bg-light:#f8fafc;
+  --text-dark:#e2e8f0;
+  --text-light:#1e293b;
+  --primary:#6366f1;
+  --secondary:#22d3ee;
+}
+body {
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:var(--bg-dark);
+  color:var(--text-dark);
+  transition:background 0.4s,color 0.4s;
+}
+header {
+  background:var(--primary);
+  color:#fff;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 10px rgba(0,0,0,0.4);
+}
+header h1 {font-size:20px;margin:0;}
+#theme-btn,#menu-btn {font-size:22px;cursor:pointer;transition:0.3s;}
+#theme-btn:hover,#menu-btn:hover {color:var(--secondary);}
+#menu {
+  display:none;
+  position:absolute;
+  top:60px;right:10px;
+  background:var(--bg-light);
+  color:var(--text-light);
+  border-radius:15px;padding:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+#menu a {
+  display:block;
+  padding:8px 15px;
+  text-decoration:none;
+  color:inherit;
+  border-radius:10px;
+}
+#menu a:hover {background:rgba(99,102,241,0.1);}
+#chat-container {display:flex;flex-direction:column;height:calc(100vh - 60px);}
+#messages {flex:1;overflow-y:auto;padding:15px;scroll-behavior:smooth;}
+.message {display:flex;align-items:flex-start;margin:12px 0;}
+.message img {
+  width:45px;height:45px;border-radius:50%;margin-right:10px;border:2px solid var(--secondary);
+}
+.message-content {
+  max-width:70%;
+  padding:10px 15px;
+  border-radius:15px;
+  background:#1e293b;
+  color:#e2e8f0;
+  box-shadow:0 2px 5px rgba(0,0,0,0.3);
+}
+.user {flex-direction:row-reverse;}
+.user .message-content {background:#6366f1;color:#fff;}
+.user img {margin-left:10px;margin-right:0;}
+#input-container {
+  display:flex;
+  align-items:center;
+  padding:10px;
+  background:#111827;
+  border-top:1px solid #1e293b;
+}
+#user-input {
+  flex:1;
+  padding:10px 15px;
+  border-radius:25px;
+  border:none;
+  outline:none;
+  background:#1e293b;
+  color:#fff;
+}
+#input-container button {
+  margin-left:8px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  padding:10px 12px;
+  border-radius:50%;
+  cursor:pointer;
+  transition:0.3s;
+}
+#input-container button:hover {background:var(--secondary);}
+.photo-preview {max-width:200px;border-radius:10px;margin-top:5px;}
+.lang-select {
+  position:absolute;
+  top:70px;left:10px;
+  background:#1e293b;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:5px;
+}
+
+@keyframes bannerBounce {
+  0% { bottom: -150px; opacity: 0; }
+  60% { bottom: 40px; opacity: 1; }
+  80% { bottom: 25px; }
+  100% { bottom: 30px; }
+}
+</style>
+</head>
+<body>
+<!-- Cookie Banner -->
+<div id="cookieBanner" style="
+  position:fixed;
+  bottom:-150px; /* kòmanse anba paj la pou animasyon */
+  left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  max-width:500px;
+  background:#111827;
+  color:#fff;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  z-index:10000;
+  box-shadow:0 -2px 10px rgba(0,0,0,0.5);
+  font-family:'Poppins',sans-serif;
+  border-radius:12px;
+  opacity:0;
+  transition:all 0.6s ease;
+">
+  <span style="margin-bottom:12px; text-align:center;">
+    Nous utilisons des cookies pour améliorer votre expérience.<br>
+    💳 Profitez de votre <b>Dave Topup</b> maintenant!
+  </span>
+  <div style="display:flex; justify-content:center; gap:10px; width:100%;">
+    <button id="acceptBtn" style="flex:1;padding:10px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer;">Accept</button>
+    <button id="refuseBtn" style="flex:1;padding:10px;background:#f44336;color:#fff;border:none;border-radius:8px;cursor:pointer;">Refuse</button>
+    <button id="learnBtn" style="flex:1;padding:10px;background:#22d3ee;color:#000;border:none;border-radius:8px;cursor:pointer;">Learn More</button>
+  </div>
+</div>
+
+
+<header>
+  <h1><i class="fa-solid fa-robot"></i> Dawens Chatbot</h1>
+  <div>
+    <i id="theme-btn" class="fa-solid fa-sun"></i>
+    <i id="menu-btn" class="fa-solid fa-bars"></i>
+  </div>
+</header>
+
+<select id="lang" class="lang-select">
+  <option value="fr">🇫🇷 FR</option>
+  <option value="en">🇺🇸 EN</option>
+  <option value="es">🇪🇸 ES</option>
+  <option value="pt">🇧🇷 PT</option>
+  <option value="ht">🇭🇹 HT</option>
+  <option value="jp">🇯🇵 JP</option>
+  <option value="kr">🇰🇷 KR</option>
+</select>
+
+<!-- menu snippet -->
+<div id="menu">
+  <a href="bot/library.html">library</a>
+  <a id="reportBugLink" href="Report-bug.html">Report bug</a>
+  <a href="bot/setting.html">Setting</a>
+</div>
+
+<div id="chat-container">
+  <div id="messages"></div>
+
+  <div id="input-container">
+    <button id="mic-btn"><i class="fa fa-microphone"></i></button>
+    <button id="upload-btn"><i class="fa fa-image"></i></button>
+    <input type="file" id="upload-photo" accept="image/*" style="display:none;">
+    <input type="text" id="user-input" placeholder="Écrivez un message...">
+    <button id="send-btn"><i class="fa fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script>
+const userPhoto='https://files.catbox.moe/j8obz7.png';
+const botPhoto='https://files.catbox.moe/o1ai21.png';
+const messages=document.getElementById('messages');
+const input=document.getElementById('user-input');
+const themeBtn=document.getElementById('theme-btn');
+let darkMode=localStorage.getItem('theme')!=='light';
+let messageCount=0;
+let lastTime=parseInt(localStorage.getItem('lastTime')||'0',10);
+
+// Initial Theme
+function applyTheme(){
+  if(darkMode){
+    document.body.style.background='#0f172a';
+    document.body.style.color='#e2e8f0';
+    themeBtn.classList.replace('fa-moon','fa-sun');
+  } else {
+    document.body.style.background='#f8fafc';
+    document.body.style.color='#1e293b';
+    themeBtn.classList.replace('fa-sun','fa-moon');
+  }
+}
+applyTheme();
+
+// Toggle Theme
+themeBtn.onclick=()=>{
+  darkMode=!darkMode;
+  localStorage.setItem('theme',darkMode?'dark':'light');
+  applyTheme();
+};
+
+// Menu toggle
+const menu=document.getElementById('menu');
+document.getElementById('menu-btn').onclick=()=>{
+  menu.style.display=menu.style.display==='block'?'none':'block';
+};
+
+// Add message
+function addMessage(text,sender='user',photo){
+  const msg=document.createElement('div');
+  msg.classList.add('message',sender);
+  const img=document.createElement('img');
+  img.src=photo||(sender==='user'?userPhoto:botPhoto);
+  const content=document.createElement('div');
+  content.classList.add('message-content');
+  content.innerHTML=text;
+  msg.appendChild(img);
+  msg.appendChild(content);
+  messages.appendChild(msg);
+  messages.scrollTop=messages.scrollHeight;
+}
+
+// Gemini/OpenAI fallback
+async function sendMessage(prompt){
+  if(messageCount>=50){
+    const now=Date.now();
+    if(now-lastTime<86400000){
+      addMessage("⏳ Limite 50 messages / 24h atteinte. Réessayez plus tard.",'bot',botPhoto);
+      return;
+    } else {messageCount=0;}
+  }
+  messageCount++;
+  localStorage.setItem('lastTime',Date.now());
+  const lang=document.getElementById('lang').value;
+  addMessage('<i>Le bot réfléchit...</i>','bot',botPhoto);
+
+  // Eseye Gemini si gen kle
+  const GEMINI_API_KEY = "YOUR_GEMINI_KEY"; // mete kle w si ou genyen
+
+  try {
+    if(GEMINI_API_KEY && GEMINI_API_KEY!=="AIzaSyB7URXCSpZtdCdKCjBGkvV27nLURDDn1FM"){
+      const res = await fetch("https://api.gemini.com/v1/complete",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":`Bearer ${GEMINI_API_KEY}`
+        },
+        body:JSON.stringify({prompt,max_tokens:150})
+      });
+      const data = await res.json();
+      const reply = data.reply || data.text || "Erreur.";
+      addMessage(reply,'bot',botPhoto);
+      speakReply(reply,lang);
+      return;
+    }
+  } catch(e){
+    console.warn("Gemini API failed, fallback to OpenAI:",e);
+  }
+
+  // Fallback OpenAI
+  const OPENAI_API_KEY = "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"; // mete kle w isit
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":`Bearer ${OPENAI_API_KEY}`
+      },
+      body:JSON.stringify({
+        model:"gpt-4",
+        messages:[
+          {role:"system",content:"Ou se yon AI assistant pou shop bot"},
+          {role:"user",content:prompt}
+        ],
+        max_tokens:200
+      })
+    });
+    const data = await res.json();
+    const reply = data.choices && data.choices[0].message.content
+      ? data.choices[0].message.content
+      : "🤖 Je n'ai pas de réponse pour le moment";
+    addMessage(reply,'bot',botPhoto);
+    speakReply(reply,lang);
+  } catch(e){
+    console.error("OpenAI API error:",e);
+    addMessage("❌ Erreur lors de l'appel OpenAI.",'bot',botPhoto);
+  }
+}
+
+// Bot voice reply
+function speakReply(text,lang){
+  if('speechSynthesis' in window){
+    const speech=new SpeechSynthesisUtterance(text);
+    const map={fr:'fr-FR',en:'en-US',es:'es-ES',pt:'pt-PT',ht:'ht-HT',jp:'ja-JP',kr:'ko-KR'};
+    speech.lang=map[lang]||'fr-FR';
+    window.speechSynthesis.speak(speech);
+  }
+}
+
+// Send button
+document.getElementById('send-btn').onclick=()=>{
+  const text=input.value.trim();
+  if(text){
+    addMessage(text,'user');
+    sendMessage(text);
+    input.value='';
+  }
+};
+
+// Voice recognition
+let recognition;
+if('webkitSpeechRecognition' in window){
+  recognition=new webkitSpeechRecognition();
+  recognition.lang='fr-FR';
+  recognition.onresult=e=>{
+    const transcript=e.results[0][0].transcript;
+    addMessage(transcript,'user');
+    sendMessage(transcript);
+  };
+}
+document.getElementById('mic-btn').onclick=()=>{
+  if(recognition) recognition.start();
+};
+
+// Upload photo
+document.getElementById('upload-photo').onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const userMsg = prompt("Ajoute yon mesaj pou foto sa a (oswa kite vid pou seulement foto):");
+  const reader = new FileReader();
+  reader.onload = x => {
+    const imgData = x.target.result;
+    let content = `<img src="${imgData}" class="photo-preview">`;
+    if (userMsg && userMsg.trim() !== '') content += `<br>${userMsg}`;
+    addMessage(content,'user');
+    saveToLibrary(imgData,userMsg);
+    if(userMsg && userMsg.trim()!=='') sendMessage(userMsg);
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+};
+
+// Save to localStorage
+function saveToLibrary(imageData,message=''){
+  const library=JSON.parse(localStorage.getItem('chatLibrary')||'[]');
+  library.push({image:imageData,message,date:new Date().toISOString()});
+  localStorage.setItem('chatLibrary',JSON.stringify(library));
+}
+
+// Auto select lang from browser
+window.addEventListener('load',()=>{
+  const browserLang=navigator.language.slice(0,2);
+  const langSelect=document.getElementById('lang');
+  if([...langSelect.options].some(opt=>opt.value===browserLang)) langSelect.value=browserLang;
+  addMessage("👋 Bienvenue sur <b>Dawens Chatbot Pro+</b> — comment puis-je vous aider aujourd’hui ?",'bot',botPhoto);
+});
+</script>
+</body>
+</html>
