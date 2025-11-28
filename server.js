@@ -298,5 +298,13 @@ cron.schedule("0 10 */2 * *", async () => {
 
 });
 
+// ====== PORT BINDING ======
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
 // ====== EXPORT FOR VERCEL ======
 module.exports = app;
